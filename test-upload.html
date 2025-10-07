@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test File Upload</title>
+</head>
+<body>
+  <h1>Test File Upload</h1>
+  <form id="uploadForm" action="http://localhost:3000/fetures/material" method="POST" enctype="multipart/form-data">
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required>
+    <br><br>
+
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" required></textarea>
+    <br><br>
+
+    <!-- <label for="content">Content:</label>
+    <textarea id="content" name="content" required></textarea>
+    <br><br> -->
+
+    <label for="links">Links (comma-separated):</label>
+    <input type="text" id="links" name="links" placeholder="https://example.com, https://example2.com">
+    <br><br>
+
+    <!-- <label for="youtubeLink">YouTube Link:</label>
+    <input type="url" id="youtubeLink" name="youtubeLink" placeholder="https://www.youtube.com/watch?v=yourvideo">
+    <br><br> -->
+
+    <label for="scheduleTime">Schedule Time:</label>
+    <input type="datetime-local" id="scheduleTime" name="scheduleTime" required>
+    <br><br>
+
+    <label for="CRcode">Classroom Code:</label>
+    <input type="text" id="CRcode" name="CRcode" required>
+    <br><br>
+
+    <label for="image">Upload File (Image or PDF):</label>
+    <input type="file" id="image" name="image" accept=".png, .jpg, .jpeg, .pdf" required>
+    <br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>

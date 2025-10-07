@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "@coreui/icons": "^3.0.1",
+    "@coreui/icons-react": "^2.3.0",
+    "@coreui/react": "^5.9.0",
+    "@shadcn/ui": "^0.0.4",
+    "@stream-io/video-react-sdk": "^1.23.1",
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "install": "^0.13.0",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.544.0",
+    "mongoose": "^8.18.3",
+    "multer": "^2.0.2",
+    "nanoid": "^5.1.6",
+    "nodemailer": "^7.0.6",
+    "npm": "^11.6.1",
+    "otp-generator": "^4.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-google-button": "^0.8.0",
+    "react-social-login-buttons": "^4.1.1",
+    "social-login-buttons": "^0.0.4",
+    "socket.io": "^4.8.1"
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "classrooms": [
+    {
+      "_id": "67890abcdef123456789",
+      "CRName": "Mathematics Class 10th",
+      "CRDescription": "Advanced mathematics course covering algebra, geometry, and calculus fundamentals for 10th grade students.",
+      "CRcode": "MATH10A",
+      "CRsubject": "Mathematics",
+      "adminname": "Priya Sharma",
+      "adminId": "teacher123456789",
+      "students": ["student001", "student002", "student003", "student004", "student005"],
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z",
+      "type": "created",
+      "role": "admin",
+      "posts": [
+        {
+          "_id": "post001",
+          "title": "Welcome to Mathematics Class 10th",
+          "content": "Welcome students! This semester we'll cover advanced topics in algebra and geometry. Please check the syllabus uploaded in assignments section.",
+          "createdAt": "2024-01-15T11:00:00.000Z",
+          "author": "Priya Sharma"
+        },
+        {
+          "_id": "post002", 
+          "title": "Class Schedule Updated",
+          "content": "New class timings: Monday, Wednesday, Friday - 10:00 AM to 11:30 AM. Please note the change.",
+          "createdAt": "2024-01-16T09:15:00.000Z",
+          "author": "Priya Sharma"
+        },
+        {
+          "_id": "post003",
+          "title": "Important Notice",
+          "content": "Mid-term exams will be conducted next week. Please prepare chapters 1-5.",
+          "createdAt": "2024-01-18T14:20:00.000Z",
+          "author": "Priya Sharma"
+        }
+      ],
+      "assignments": [
+        {
+          "_id": "assign001",
+          "title": "Mathematics Assignment 1 - Algebra",
+          "description": "Complete exercises 1-10 from chapter 2. Solve all quadratic equations and show working steps.",
+          "dueDate": "2024-01-25T23:59:59.000Z",
+          "status": "active",
+          "maxMarks": 50,
+          "submittedCount": 3
+        },
+        {
+          "_id": "assign002",
+          "title": "Geometry Project Work",
+          "description": "Create a presentation on different types of triangles with real-world examples.",
+          "dueDate": "2024-02-01T23:59:59.000Z", 
+          "status": "active",
+          "maxMarks": 100,
+          "submittedCount": 1
+        }
+      ],
+      "tests": [
+        {
+          "_id": "test001",
+          "title": "Mid-term Mathematics Exam",
+          "description": "Comprehensive test covering algebra and basic geometry concepts.",
+          "date": "2024-01-28T10:00:00.000Z",
+          "duration": 90,
+          "maxMarks": 100,
+          "status": "scheduled"
+        },
+        {
+          "_id": "test002",
+          "title": "Weekly Quiz - Quadratic Equations",
+          "description": "Quick assessment on quadratic equations and their applications.",
+          "date": "2024-01-22T10:00:00.000Z",
+          "duration": 30,
+          "maxMarks": 25,
+          "status": "completed"
+        }
+      ],
+      "stats": {
+        "totalPosts": 3,
+        "totalAssignments": 2,
+        "totalTests": 2,
+        "totalStudents": 5
+      }
+    },
+    {
+      "_id": "abcdef123456789012",
+      "CRName": "English Literature Class 12th",
+      "CRDescription": "Advanced English literature course focusing on classic and contemporary works, poetry analysis, and creative writing for 12th grade students.",
+      "CRcode": "ENG12B",
+      "CRsubject": "English Literature",
+      "adminname": "Rajesh Kumar",
+      "adminId": "teacher987654321",
+      "students": ["student006", "student007", "student008", "student009"],
+      "createdAt": "2024-01-10T14:20:00.000Z",
+      "updatedAt": "2024-01-10T14:20:00.000Z",
+      "type": "joined",
+      "role": "student",
+      "posts": [
+        {
+          "_id": "post004",
+          "title": "Welcome to English Literature",
+          "content": "This year we'll explore works by Shakespeare, Wordsworth, and modern Indian authors. Exciting journey ahead!",
+          "createdAt": "2024-01-10T15:00:00.000Z",
+          "author": "Rajesh Kumar"
+        },
+        {
+          "_id": "post005",
+          "title": "Reading List Updated",
+          "content": "Please download the updated reading list from the assignments section. New books added for this semester.",
+          "createdAt": "2024-01-12T10:30:00.000Z",
+          "author": "Rajesh Kumar"
+        }
+      ],
+      "assignments": [
+        {
+          "_id": "assign003",
+          "title": "Shakespeare Essay - Hamlet Analysis",
+          "description": "Write a 1500-word essay analyzing the character development of Hamlet. Focus on his psychological journey.",
+          "dueDate": "2024-01-30T23:59:59.000Z",
+          "status": "active",
+          "maxMarks": 75,
+          "submittedCount": 2
+        },
+        {
+          "_id": "assign004",
+          "title": "Poetry Recitation",
+          "description": "Memorize and recite any poem by William Wordsworth. Video submission required.",
+          "dueDate": "2024-02-05T23:59:59.000Z",
+          "status": "active", 
+          "maxMarks": 25,
+          "submittedCount": 0
+        },
+        {
+          "_id": "assign005",
+          "title": "Creative Writing - Short Story",
+          "description": "Write an original short story (800-1000 words) on the theme of 'friendship'.",
+          "dueDate": "2024-02-10T23:59:59.000Z",
+          "status": "active",
+          "maxMarks": 50,
+          "submittedCount": 1
+        }
+      ],
+      "tests": [
+        {
+          "_id": "test003",
+          "title": "Literature Comprehension Test",
+          "description": "Test on Shakespeare's plays and Romantic poetry comprehension.",
+          "date": "2024-01-26T11:00:00.000Z",
+          "duration": 120,
+          "maxMarks": 80,
+          "status": "scheduled"
+        }
+      ],
+      "stats": {
+        "totalPosts": 2,
+        "totalAssignments": 3,
+        "totalTests": 1,
+        "totalStudents": 4
+      }
+    }
+  ],
+  "totalClassrooms": 2
+}
