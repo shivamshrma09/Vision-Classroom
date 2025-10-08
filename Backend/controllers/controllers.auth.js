@@ -1,13 +1,12 @@
 const OtpModel = require("../models/OtpModel");
 const userModel = require("../models/UserModel"); 
 const crypto = require("crypto");
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const jwt = require('jsonwebtoken');
 
 async function Singup(req, res) {
   const { email, password, role, otpuserenter, name, strem } = req.body;
   
-  // Check OTP verification
   const Otpuserexiste = await OtpModel.findOne({ email });
   if (!Otpuserexiste) {
     return res.status(404).send("Invalid or expired OTP");
@@ -106,16 +105,29 @@ async function Otpsender(req, res) {
 
     const otp = crypto.randomInt(100000, 999999);
 
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+    const msg = {
+      to: email,
+      from: process.env.SENDGRID_FROM_EMAIL,
+      subject: 'Vision Classroom OTP',
+      text: `Your OTP for Vision Classroom is: ${otp}`,
+      html: `<h2>Vision Classroom</h2><p>Your OTP is: <strong>${otp}</strong></p><p>This OTP will expire in 5 minutes.</p>`
+    };
+
+    await sgMail.send(msg);
+    console.log(`Email sent to ${email}`);
+
     const addotp = await OtpModel.create({
       email,
       otp
     });
 
-    console.log(`OTP for ${email}: ${otp}`);
-
-    res
-      .status(200)
-      .json({ status: "success", message: "OTP generated successfully", otp: otp });
+    res.status(200).json({ 
+      status: "success", 
+      message: "Email sent successfully" 
+    });
+    
   } catch (err) {
     console.error("Error sending email:", err);
     res.status(500).json({
