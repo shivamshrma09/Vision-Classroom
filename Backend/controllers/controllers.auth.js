@@ -125,12 +125,12 @@ async function Otpsender(req, res) {
     const otp = crypto.randomInt(100000, 999999)
 
        const transporter = nodemailer.createTransport({
-       host: "smtp.gmail.com",
-       port: 465,
-       secure: true, 
+       host: "smtp.resend.com",
+       port: 587,
+       secure: false,
        auth: {
-         user: process.env.EMAIL_USER,
-         pass: process.env.EMAIL_PASS,
+         user: "resend",
+         pass: process.env.RESEND_API_KEY,
        }
      });
     
@@ -138,11 +138,10 @@ async function Otpsender(req, res) {
 
 
     const mailOptions = {
-      from: process.env.SENDER_EMAIL, 
+      from: "Vision Classroom <onboarding@resend.dev>", 
       to: `${name} <${email}>`, 
-      replyTo: process.env.REPLY_TO, 
       subject: "Vision Classroom OTP",
-      text: "Your OTP is"  +  " "+ `${otp}`, 
+      text: "Your OTP is: " + `${otp}`, 
     };
 
     const info = await transporter.sendMail(mailOptions)
