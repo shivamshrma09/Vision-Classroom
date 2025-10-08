@@ -1,13 +1,17 @@
 const OtpModel = require("../models/OtpModel");
 const userModel = require("../models/UserModel"); 
 const crypto = require("crypto");
-const nodemailer = require('nodemailer'); 
+const { Resend } = require('resend');
 const jwt = require('jsonwebtoken');
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 
 async function Singup(req, res) {
   const { email, password, role, otpuserenter, name, strem } = req.body;
+  
+  // Check OTP verification
   const Otpuserexiste = await OtpModel.findOne({ email });
   if (!Otpuserexiste) {
     return res.status(404).send("Invalid or expired OTP");
@@ -114,7 +118,7 @@ async function getprofile(req, res) {
 
 async function Otpsender(req, res) {
   try {
-    const { name ,email } = req.body;
+    const { name, email } = req.body;
 
     if (!name || !email) {
       return res
@@ -122,36 +126,27 @@ async function Otpsender(req, res) {
         .json({ status: "error", message: "Missing required fields" });
     }
 
-    const otp = crypto.randomInt(100000, 999999)
+    const otp = crypto.randomInt(100000, 999999);
 
-       const transporter = nodemailer.createTransport({
-       host: "smtp.resend.com",
-       port: 587,
-       secure: false,
-       auth: {
-         user: "resend",
-         pass: process.env.RESEND_API_KEY,
-       }
-     });
-    
+    // Use Resend SDK
+    const { data, error } = await resend.emails.send({
+      from: 'Vision Classroom <onboarding@resend.dev>',
+      to: [email],
+      subject: 'Vision Classroom OTP',
+      html: `<p>Your OTP is: <strong>${otp}</strong></p>`
+    });
 
+    if (error) {
+      console.error('Resend error:', error);
+      throw new Error(`Resend error: ${error.message}`);
+    }
 
+    console.log('Email sent successfully:', data);
 
-    const mailOptions = {
-      from: "Vision Classroom <onboarding@resend.dev>", 
-      to: `${name} <${email}>`, 
-      subject: "Vision Classroom OTP",
-      text: "Your OTP is: " + `${otp}`, 
-    };
-
-    const info = await transporter.sendMail(mailOptions)
-    console.log("Email sent:", info.response);
-
-
-     const addotp = await OtpModel.create({
-     email,
-     otp
-  });
+    const addotp = await OtpModel.create({
+      email,
+      otp
+    });
 
     res
       .status(200)
