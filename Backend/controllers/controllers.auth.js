@@ -1,7 +1,7 @@
 const OtpModel = require("../models/OtpModel");
 const userModel = require("../models/UserModel"); 
 const crypto = require("crypto");
-const sgMail = require('@sendgrid/mail');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
 async function Singup(req, res) {
@@ -106,26 +106,16 @@ async function Otpsender(req, res) {
 
     const otp = crypto.randomInt(100000, 999999);
 
-    sgMail.setApiKey('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');
-
-    const msg = {
-      to: email,
-      from: 'shivamsharma2710755@gmail.com',
-      subject: 'Vision Classroom OTP',
-      text: `Your OTP is: ${otp}`,
-    };
-
-    await sgMail.send(msg);
-    console.log('Email sent via SendGrid');
-
     const addotp = await OtpModel.create({
       email,
       otp
     });
 
+    console.log(`OTP for ${email}: ${otp}`);
+
     res
       .status(200)
-      .json({ status: "success", message: "Email sent successfully" });
+      .json({ status: "success", message: "OTP generated successfully", otp: otp });
   } catch (err) {
     console.error("Error sending email:", err);
     res.status(500).json({
