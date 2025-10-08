@@ -4,8 +4,6 @@ const crypto = require("crypto");
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
-
-
 async function Singup(req, res) {
   const { email, password, role, otpuserenter, name, strem } = req.body;
   
@@ -40,13 +38,6 @@ async function Singup(req, res) {
   return res.status(201).json({ token, user, mas: "sjssjs" });
 }
 
-
-
-
-
-
-
-
 async function login(req, res) {
   const { email, password } = req.body;
 
@@ -66,10 +57,6 @@ async function login(req, res) {
   res.cookie("token", token);
   res.status(200).json({ token });
 }
-
-
-
-
 
 async function getprofile(req, res) {
   try {
@@ -106,13 +93,6 @@ async function getprofile(req, res) {
     return res.status(500).json({ message: "Server error" });
   }
 }
-
-
-
-
-
-
-
 
 async function Otpsender(req, res) {
   try {

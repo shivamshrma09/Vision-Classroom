@@ -21,7 +21,11 @@
     "multer": "^1.4.4",
     "nanoid": "^5.0.0",
     "bcryptjs": "^2.4.3",
+<<<<<<< HEAD
     "nodemailer": "^6.9.8"
+=======
+    "resend": "^3.2.0"
+>>>>>>> e8e53ce76d3f40c57b9775acc132b33f4f63f217
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
