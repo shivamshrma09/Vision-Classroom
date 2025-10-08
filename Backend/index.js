@@ -14,7 +14,7 @@ dotenv.config();
 connectToDb();
 
 const corsOptions = {
-   origin: [ 'https://visionclassroo0m-jkiw.vercel.app'],
+   origin: ['https://visionclassroo0m-jkiw.vercel.app', 'https://vision-classroom2.onrender.com'],
    optionsSuccessStatus: 200
 };
 
