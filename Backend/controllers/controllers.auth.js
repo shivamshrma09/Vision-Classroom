@@ -1,13 +1,17 @@
 const OtpModel = require("../models/OtpModel");
 const userModel = require("../models/UserModel"); 
 const crypto = require("crypto");
-const nodemailer = require('nodemailer'); 
+const { Resend } = require('resend');
 const jwt = require('jsonwebtoken');
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 
 async function Singup(req, res) {
   const { email, password, role, otpuserenter, name, strem } = req.body;
+  
+  // Check OTP verification
   const Otpuserexiste = await OtpModel.findOne({ email });
   if (!Otpuserexiste) {
     return res.status(404).send("Invalid or expired OTP");
@@ -124,27 +128,20 @@ async function Otpsender(req, res) {
 
     const otp = crypto.randomInt(100000, 999999);
 
-    // Use Resend HTTP API instead of SMTP
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'Vision Classroom <onboarding@resend.dev>',
-        to: [email],
-        subject: 'Vision Classroom OTP',
-        text: `Your OTP is: ${otp}`
-      })
+    // Use Resend SDK
+    const { data, error } = await resend.emails.send({
+      from: 'Vision Classroom <onboarding@resend.dev>',
+      to: [email],
+      subject: 'Vision Classroom OTP',
+      html: `<p>Your OTP is: <strong>${otp}</strong></p>`
     });
 
-    if (!response.ok) {
-      throw new Error(`Resend API error: ${response.status}`);
+    if (error) {
+      console.error('Resend error:', error);
+      throw new Error(`Resend error: ${error.message}`);
     }
 
-    const result = await response.json();
-    console.log("Email sent via Resend:", result);
+    console.log('Email sent successfully:', data);
 
     const addotp = await OtpModel.create({
       email,
