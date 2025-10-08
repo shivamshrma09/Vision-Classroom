@@ -25,7 +25,7 @@ function Singup() {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [strem, setStrem] = useState('');
-  const [otpuserenter, setOtpuserenter] = useState('');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -36,7 +36,6 @@ function Singup() {
         name,
         role,
         strem,
-        otpuserenter,
         email,
         password
       });   
@@ -72,22 +71,7 @@ function Singup() {
   
           
 
-  const otpsender = async (e) => {
-    e.preventDefault();
-    if (!email || !name) {
-      alert('Please enter name and email first');
-      return;
-    }
-    try {
-      const response = await axiosInstance.post("/users/send-emails", {
-        email,
-        name
-      });
-      alert('OTP sent to your email!');
-    } catch (error) {
-      alert('Failed to send OTP!');
-    }
-  }
+
   return (
     <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
@@ -119,19 +103,13 @@ function Singup() {
             
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  className="flex-1"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <Button className="bg-[#356AC3]/90 hover:bg-[#356AC3] text-sm px-3"  onClick={otpsender}>
-                  Send OTP
-                </Button>
-              </div>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             
             <div className="grid gap-2">
@@ -170,15 +148,7 @@ function Singup() {
               />
             </div>
             
-            <div className="grid gap-2">
-              <Label htmlFor="otpuserenter" className="">OTP</Label>
-              <Input 
-                id="otpuserenter" 
-                placeholder="Enter OTP" 
-                value={otpuserenter}
-                onChange={(e) => setOtpuserenter(e.target.value)}  
-              />
-            </div>
+
 
             <div className="flex items-center space-x-2">
               <input type="checkbox" id="terms" required />

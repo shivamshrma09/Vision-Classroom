@@ -10,7 +10,7 @@ router.post('/register', [
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
     body('role').isLength({ min: 1 }).withMessage('  must be at least 6 characters long'),
     body('strem').isLength({ min: 1 }).withMessage(' must be at least 6 characters long'),
-    body('otpuserenter').isLength({ min: 1 }).withMessage(' must be at least 6 characters long')
+
 
 
 ],
