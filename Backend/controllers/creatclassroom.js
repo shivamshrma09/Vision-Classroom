@@ -1,4 +1,4 @@
-const userModel = require("../models/userModel");
+const userModel = require("../models/UserModel");
 const CreatedclassroomModel = require("../models/createdclassroomModel");
 
 const { nanoid } = require('nanoid');
