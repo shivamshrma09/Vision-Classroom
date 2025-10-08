@@ -1,10 +1,8 @@
 const OtpModel = require("../models/OtpModel");
 const userModel = require("../models/UserModel"); 
 const crypto = require("crypto");
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 
@@ -128,20 +126,25 @@ async function Otpsender(req, res) {
 
     const otp = crypto.randomInt(100000, 999999);
 
-    // Use Resend SDK
-    const { data, error } = await resend.emails.send({
-      from: 'Vision Classroom <onboarding@resend.dev>',
-      to: [email],
-      subject: 'Vision Classroom OTP',
-      html: `<p>Your OTP is: <strong>${otp}</strong></p>`
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      }
     });
 
-    if (error) {
-      console.error('Resend error:', error);
-      throw new Error(`Resend error: ${error.message}`);
-    }
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: "Vision Classroom OTP",
+      text: "Your OTP is: " + otp,
+    };
 
-    console.log('Email sent successfully:', data);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Email sent:", info.response);
 
     const addotp = await OtpModel.create({
       email,
