@@ -114,7 +114,7 @@ async function getprofile(req, res) {
 
 async function Otpsender(req, res) {
   try {
-    const { name ,email } = req.body;
+    const { name, email } = req.body;
 
     if (!name || !email) {
       return res
@@ -122,36 +122,34 @@ async function Otpsender(req, res) {
         .json({ status: "error", message: "Missing required fields" });
     }
 
-    const otp = crypto.randomInt(100000, 999999)
+    const otp = crypto.randomInt(100000, 999999);
 
-       const transporter = nodemailer.createTransport({
-       host: "smtp.resend.com",
-       port: 587,
-       secure: false,
-       auth: {
-         user: "resend",
-         pass: process.env.RESEND_API_KEY,
-       }
-     });
-    
+    // Use Resend HTTP API instead of SMTP
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'Vision Classroom <onboarding@resend.dev>',
+        to: [email],
+        subject: 'Vision Classroom OTP',
+        text: `Your OTP is: ${otp}`
+      })
+    });
 
+    if (!response.ok) {
+      throw new Error(`Resend API error: ${response.status}`);
+    }
 
+    const result = await response.json();
+    console.log("Email sent via Resend:", result);
 
-    const mailOptions = {
-      from: "Vision Classroom <onboarding@resend.dev>", 
-      to: `${name} <${email}>`, 
-      subject: "Vision Classroom OTP",
-      text: "Your OTP is: " + `${otp}`, 
-    };
-
-    const info = await transporter.sendMail(mailOptions)
-    console.log("Email sent:", info.response);
-
-
-     const addotp = await OtpModel.create({
-     email,
-     otp
-  });
+    const addotp = await OtpModel.create({
+      email,
+      otp
+    });
 
     res
       .status(200)
