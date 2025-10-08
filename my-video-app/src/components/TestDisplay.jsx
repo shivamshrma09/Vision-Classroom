@@ -24,11 +24,10 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
   }
 
   const isTestStartable = () => {
-    if (isTeacher) return true // Teachers can always start tests
+    if (isTeacher) return true 
     
     const now = new Date()
     
-    // Check if test has started (schedule time)
     if (test.scheduleTime) {
       const scheduleTime = new Date(test.scheduleTime)
       if (now < scheduleTime) return false
@@ -43,7 +42,7 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
   
   const viewResults = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/fetures/test-results/${classData?.CRcode}/${test._id}`)
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/test-results/${classData?.CRcode}/${test._id}`)
       const data = await response.json()
       
       if (response.ok) {
@@ -63,7 +62,7 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
     
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}')
-      const response = await fetch('http://localhost:4000/fetures/test-comment', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/test-comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -95,7 +94,6 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-4">
-      {/* Test Header */}
       <div className="p-4 border-b border-gray-100">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-[#356AC3] flex items-center justify-center">
@@ -108,7 +106,6 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
         </div>
       </div>
 
-      {/* Test Content */}
       <div className="p-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">{test.title}</h3>
         <p className="text-gray-600 text-sm mb-3">{test.description}</p>
@@ -124,7 +121,6 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
         </div>
       </div>
 
-      {/* Test Actions */}
       <div className="px-4 py-3 border-t border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
@@ -170,10 +166,8 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
         </div>
       </div>
 
-      {/* Comments Section */}
       {showComments && (
         <div className="border-t border-gray-100">
-          {/* Add Comment */}
           <div className="p-4 border-b border-gray-100">
             <div className="flex space-x-3">
               <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -198,7 +192,6 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
             </div>
           </div>
 
-          {/* Comments List */}
           <div className="p-4 space-y-3">
             {comments.map(comment => (
               <div key={comment._id || comment.id} className="flex space-x-3">
@@ -220,7 +213,6 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
 
 
 
-      {/* Results Modal */}
       {showResults && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-96 overflow-y-auto">
@@ -269,7 +261,6 @@ function TestDisplay({ test, onStartTest, classData, onCommentAdded }) {
         </div>
       )}
 
-      {/* Start Test Modal */}
       {showStartModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">

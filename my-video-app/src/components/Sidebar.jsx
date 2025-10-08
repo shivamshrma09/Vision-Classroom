@@ -9,8 +9,6 @@ const Sidebar = ({ onSelectMenu, isTeacher, classData, activeMenu }) => {
       }
       return {};
     } catch (error) {
-      console.error('Error parsing user data:', error);
-      // Clear corrupted data
       localStorage.removeItem('user');
       return {};
     }
@@ -32,7 +30,6 @@ const Sidebar = ({ onSelectMenu, isTeacher, classData, activeMenu }) => {
   
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      {/* Sidebar */}
       <div style={{
         width: '270px',
         backgroundColor: 'white',
@@ -43,7 +40,6 @@ const Sidebar = ({ onSelectMenu, isTeacher, classData, activeMenu }) => {
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {/* Header */}
         <div style={{
           backgroundColor: '#356AC3',
           padding: '16px',
@@ -52,12 +48,22 @@ const Sidebar = ({ onSelectMenu, isTeacher, classData, activeMenu }) => {
           fontSize: '18px',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: '12px'
         }}>
-          Classroom Mitra
+          <div style={{
+            width: '32px',
+            height: '32px',
+            backgroundColor: 'white',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <img src="/LOGO.png" alt="Vision Classroom" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+          </div>
+          Vision Classroom
         </div>
         
-        {/* Navigation */}
         <div style={{ padding: '12px', flex: 1 }}>
           <div 
             onClick={() => onSelectMenu('dashboard')}
@@ -192,7 +198,6 @@ const Sidebar = ({ onSelectMenu, isTeacher, classData, activeMenu }) => {
           </div>
         </div>
         
-        {/* User Info */}
         <div style={{
           padding: '12px',
           borderTop: '1px solid #e5e7eb',
@@ -228,7 +233,6 @@ const Sidebar = ({ onSelectMenu, isTeacher, classData, activeMenu }) => {
         </div>
       </div>
       
-      {/* Header */}
       <div style={{
         position: 'fixed',
         top: 0,

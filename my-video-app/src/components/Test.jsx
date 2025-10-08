@@ -40,7 +40,6 @@ function Test({ onCreate, classData }) {
     const updatedQuestions = [...questions]
     updatedQuestions[index][field] = value
     
-    // Reset correct answer when changing question type
     if (field === 'type') {
       updatedQuestions[index].correctAnswer = value === 'multiple_choice' ? [] : null
     }
@@ -80,7 +79,6 @@ function Test({ onCreate, classData }) {
       return;
     }
     
-    // Validate questions have content
     const validQuestions = questions.filter(q => q.questiontitle.trim());
     if (validQuestions.length === 0) {
       alert('Please add at least one question with a title');
@@ -93,7 +91,6 @@ function Test({ onCreate, classData }) {
         alert(`Question "${q.questiontitle}" needs at least 2 options`);
         return null;
       }
-      // Convert answer to string format for database
       let answerString = '';
       if (q.type === 'multiple_choice' && Array.isArray(q.correctAnswer)) {
         answerString = q.correctAnswer.join(',');
@@ -109,7 +106,6 @@ function Test({ onCreate, classData }) {
       };
     });
     
-    // Check if any question validation failed
     if (formattedQuestions.includes(null)) {
       return;
     }
@@ -131,7 +127,6 @@ function Test({ onCreate, classData }) {
       onCreate(newTest)
     }
     
-    // Reset form
     setTestTitle('')
     setTestDescription('')
     setScheduleTime('')
@@ -149,9 +144,7 @@ function Test({ onCreate, classData }) {
 
   return (
     <div className="w-full h-full overflow-y-auto">
-      {/* Main Test Form Card */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -192,7 +185,6 @@ function Test({ onCreate, classData }) {
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="p-4">
           <input
             type="text"
@@ -208,7 +200,6 @@ function Test({ onCreate, classData }) {
             className="w-full min-h-20 p-3 mb-4 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#356AC3] focus:border-transparent text-gray-700"
           />
           
-          {/* Questions Section */}
           <div className="space-y-4">
             <h3 className="font-medium text-gray-900">Questions</h3>
             {questions.map((question, qIndex) => (
@@ -312,7 +303,6 @@ function Test({ onCreate, classData }) {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="flex items-center justify-between p-4 border-t border-gray-100">
           <div className="flex items-center space-x-3">
             <span className="text-sm text-gray-500">Shivam Kumar</span>
@@ -332,7 +322,6 @@ function Test({ onCreate, classData }) {
         </div>
       </div>
 
-      {/* Schedule & Settings Card */}
       <div className="mt-3 bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="p-3">
           <h3 className="text-xs font-medium text-gray-700 mb-2">Schedule & Settings</h3>

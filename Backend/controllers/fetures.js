@@ -3,16 +3,16 @@ const userModel = require("../models/userModel");
 
 
 
-//Post generater
+
 async function post(req, res) {
   const { title, description, content, links, youtubeLink, scheduleTime, CRcode } = req.body;
 
   let fileData = null;
   if (req.file && req.file.buffer && req.file.buffer.length > 0) {
     fileData = { 
-      data: req.file.buffer.toString('base64'), // Convert file buffer to Base64
-      contentType: req.file.mimetype, // Store MIME type
-      originalName: req.file.originalname // Store original file name
+      data: req.file.buffer.toString('base64'), 
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname
     };
   }
 
@@ -30,7 +30,7 @@ async function post(req, res) {
       title,
       description,
       content,
-      file: fileData, // Save Base64-encoded file data
+      file: fileData,
       links,
       youtubeLink,
       scheduleTime,
@@ -50,16 +50,16 @@ async function post(req, res) {
 
 
 
-//material generater
+
 async function material(req, res) {
   const { title, description, links, scheduleTime, CRcode } = req.body;
 
   let fileData = null;
   if (req.file && req.file.buffer && req.file.buffer.length > 0) {
     fileData = { 
-      data: req.file.buffer.toString('base64'), // Convert file buffer to Base64
-      contentType: req.file.mimetype, // Store MIME type
-      originalName: req.file.originalname // Store original file name
+      data: req.file.buffer.toString('base64'),
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname 
     };
   } else {
     console.error("Uploaded material file is empty or missing. File details:", req.file);
@@ -76,12 +76,12 @@ async function material(req, res) {
     const newMaterial = {
       title,
       description,
-      file: fileData, // Save Base64-encoded file data
+      file: fileData, 
       links,
       scheduleTime,
     };
 
-    classroom.materials.push(newMaterial); // Push the material to the `materials` array
+    classroom.materials.push(newMaterial);
     await classroom.save();
 
     return res.status(201).json({ msg: "Material added to classroom successfully" });
@@ -94,16 +94,16 @@ async function material(req, res) {
 
 
 
-//assignmet poster
+
 async function assignment(req, res) {
-  const { title, description, links, scheduleTime, CRcode } = req.body; // Removed `content` since it's not provided in the request body
+  const { title, description, links, scheduleTime, CRcode } = req.body;
 
   let fileData = null;
   if (req.file && req.file.buffer && req.file.buffer.length > 0) {
     fileData = { 
-      data: req.file.buffer.toString('base64'), // Convert file buffer to Base64
-      contentType: req.file.mimetype, // Store MIME type
-      originalName: req.file.originalname // Store original file name
+      data: req.file.buffer.toString('base64'),
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname 
     };
   }
 
@@ -120,12 +120,12 @@ async function assignment(req, res) {
     const assignment = {
       title,
       description,
-      file: fileData, // Save Base64-encoded file data
+      file: fileData,
       links,
       scheduleTime,
     };
 
-    classroom.aassignmets.push(assignment); // Push the assignment to the `aassignmets` array
+    classroom.aassignmets.push(assignment); 
     await classroom.save();
 
     return res.status(201).json({ msg: "Assignment posted and added to classroom successfully" });
@@ -147,22 +147,20 @@ async function testgenerater(req, res) {
       return res.status(404).json({ msg: "Classroom not found" });
     }
 
-    // Validate and format the questions array
     const formattedQuestions = questions.map((q, index) => {
       if (!q.type || !['multiple_choice', 'checkboxes', 'dropdown', 'file_upload', 'linear_scale', 'rating', 'date', 'time'].includes(q.type)) {
         console.warn(`Invalid or missing question type for question at index ${index + 1}: ${q.questiontitle}`);
-        q.type = 'multiple_choice'; // Default to 'multiple_choice' if type is missing or invalid
+        q.type = 'multiple_choice';
       }
 
       const question = {
         questiontitle: q.questiontitle,
         type: q.type,
-        options: q.options || [], // Default to an empty array if options are not provided
-        answer: q.answer || null, // Default to null if no answer is provided
-        scale: q.scale || null // Default to null if no scale is provided
+        options: q.options || [], 
+        answer: q.answer || null, 
+        scale: q.scale || null
       };
 
-      // Handle file upload for file_upload type questions
       if (q.type === 'file_upload' && q.file) {
         question.file = {
           data: q.file.data,
@@ -174,7 +172,6 @@ async function testgenerater(req, res) {
       return question;
     });
 
-    // Create the test object
     const newTest = {
       title,
       description,
@@ -183,7 +180,6 @@ async function testgenerater(req, res) {
       expireTime
     };
 
-    // Add the test to the classroom
     classroom.tests.push(newTest);
     await classroom.save();
 
@@ -207,7 +203,7 @@ async function testgenerater(req, res) {
 
 
 
-//comment poster
+
 async function addComment(req, res) {
   const { postId, comment, CRcode, userInfo } = req.body;
   
@@ -240,7 +236,7 @@ async function addComment(req, res) {
   }
 }
 
-//assignment comment poster
+
 async function addAssignmentComment(req, res) {
   const { assignmentId, comment, CRcode, userInfo } = req.body;
   
@@ -273,7 +269,7 @@ async function addAssignmentComment(req, res) {
   }
 }
 
-//test comment poster
+
 async function addTestComment(req, res) {
   const { testId, comment, CRcode, userInfo } = req.body;
   
@@ -306,7 +302,7 @@ async function addTestComment(req, res) {
   }
 }
 
-//test result submission
+
 async function submitTestResult(req, res) {
   const { testId, studentName, studentEmail, studentId, answers, score, totalQuestions, CRcode } = req.body;
   
@@ -322,7 +318,6 @@ async function submitTestResult(req, res) {
       return res.status(404).json({ msg: "Test not found" });
     }
     
-    // Check if student has already submitted
     const existingResult = test.results.find(r => r.studentId === studentId);
     if (existingResult && studentId !== 'anonymous') {
       return res.status(400).json({ msg: "You have already submitted this test" });
@@ -349,7 +344,7 @@ async function submitTestResult(req, res) {
   }
 }
 
-//get test results for teacher
+
 async function getTestResults(req, res) {
   const { testId, CRcode } = req.params;
   
@@ -377,7 +372,7 @@ async function getTestResults(req, res) {
   }
 }
 
-//assignment submission
+
 async function submitAssignment(req, res) {
   const { assignmentId, studentId, studentName, text, CRcode } = req.body;
   
@@ -427,7 +422,7 @@ async function submitAssignment(req, res) {
   }
 }
 
-//get assignment submissions
+
 async function getAssignmentSubmissions(req, res) {
   const { assignmentId } = req.params;
   const { CRcode } = req.query;
@@ -456,7 +451,7 @@ async function getAssignmentSubmissions(req, res) {
   }
 }
 
-//submit feedback
+
 async function submitFeedback(req, res) {
   const { studentId, studentName, subject, message, rating, category, CRcode } = req.body;
   
@@ -489,7 +484,7 @@ async function submitFeedback(req, res) {
   }
 }
 
-//get all feedbacks (for teachers)
+
 async function getFeedbacks(req, res) {
   const { CRcode } = req.params;
   
@@ -512,7 +507,7 @@ async function getFeedbacks(req, res) {
   }
 }
 
-//update feedback status (for teachers)
+
 async function updateFeedbackStatus(req, res) {
   const { feedbackId, status, CRcode } = req.body;
   
@@ -539,7 +534,7 @@ async function updateFeedbackStatus(req, res) {
   }
 }
 
-//save attendance
+
 async function saveAttendance(req, res) {
   const { date, attendanceData, CRcode } = req.body;
   
@@ -550,14 +545,11 @@ async function saveAttendance(req, res) {
       return res.status(404).json({ msg: "Classroom not found" });
     }
     
-    // Check if attendance for this date already exists
     const existingAttendance = classroom.attendences.find(a => a.date === date);
     
     if (existingAttendance) {
-      // Update existing attendance
       existingAttendance.attendencelist = attendanceData;
     } else {
-      // Create new attendance record
       const newAttendance = {
         date: date,
         attendencelist: attendanceData
@@ -575,7 +567,7 @@ async function saveAttendance(req, res) {
   }
 }
 
-//get attendance for specific date
+
 async function getAttendance(req, res) {
   const { date, CRcode } = req.query;
   

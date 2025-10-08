@@ -23,23 +23,19 @@ const corsOptions = {
 const app = express();
 const PORT = 4000;
 
-// Serve static files
 
-// JSON parsing
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// Mount REST routes
 app.use('/users', userroutes);
 app.use('/classroom', creatclassroomroutes);
 app.use('/fetures', feturesroutes);
 app.use('/api/stream-token', streamTokenRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Classroom Mitra")
+  res.send("Vision Classroom")
 });
 
-// Create HTTP and Socket.io server
 
 
 app.listen(PORT, () => {

@@ -50,7 +50,6 @@ function AssignmentForm({ onCreate, classData }) {
     }
     formData.append('CRcode', crCode);
     
-    // Convert base64 back to file for FormData
     if (selectedFile && selectedFile.data) {
       const byteCharacters = atob(selectedFile.data);
       const byteNumbers = new Array(byteCharacters.length);
@@ -66,7 +65,6 @@ function AssignmentForm({ onCreate, classData }) {
       onCreate(formData);
     }
     
-    // Reset form
     setAssignmentTitle('')
     setAssignmentDescription('')
     setAssignmentLinks('')
@@ -77,7 +75,6 @@ function AssignmentForm({ onCreate, classData }) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-      {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -123,7 +120,6 @@ function AssignmentForm({ onCreate, classData }) {
         </div>
       </div>
 
-      {/* Content Area */}
       <div className="p-4">
         <input
           type="text"
@@ -139,7 +135,6 @@ function AssignmentForm({ onCreate, classData }) {
           className="w-full min-h-32 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#356AC3] focus:border-transparent text-gray-700"
         />
         
-        {/* File Upload */}
         <div className="mt-3 p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-[#356AC3] transition-colors">
           <input
             type="file"
@@ -157,7 +152,6 @@ function AssignmentForm({ onCreate, classData }) {
         </div>
       </div>
 
-      {/* Footer Actions */}
       <div className="flex items-center justify-between p-4 border-t border-gray-100">
         <div className="flex items-center space-x-3">
           <span className="text-sm text-gray-500">Shivam Kumar</span>
@@ -176,7 +170,6 @@ function AssignmentForm({ onCreate, classData }) {
         </div>
       </div>
 
-      {/* Additional Options */}
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-sm font-medium text-gray-700 mb-3">{contentType === 'assignment' ? 'Assignment Options' : 'Study Material Options'}</h3>
         <div className="grid grid-cols-1 gap-4">

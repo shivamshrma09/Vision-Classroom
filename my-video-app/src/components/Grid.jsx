@@ -12,7 +12,7 @@ function Grid({ students = [], onSaveAttendance, classData }) {
     if (!date || !classData?.CRcode) return;
     
     try {
-      const response = await fetch(`http://localhost:4000/fetures/get-attendance?date=${date}&CRcode=${classData.CRcode}`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/get-attendance?date=${date}&CRcode=${classData.CRcode}`);
       const result = await response.json();
       
       if (response.ok && result.attendance) {
@@ -40,17 +40,12 @@ function Grid({ students = [], onSaveAttendance, classData }) {
         setSavedStudents([]);
       }
     } catch (error) {
-      console.error('Error loading attendance:', error);
       setSavedStudents([]);
     }
   };
 
   const handleStatusChange = (studentId, status) => {
-    setAttendanceData(prev => {
-      const newData = { ...prev, [studentId]: status };
-      console.log('Updated attendance:', newData);
-      return newData;
-    });
+    setAttendanceData(prev => ({ ...prev, [studentId]: status }));
     
     if (savedStudents.length > 0) {
       setSavedStudents(prev => prev.map(student => 
@@ -89,15 +84,10 @@ function Grid({ students = [], onSaveAttendance, classData }) {
       });
     }
     
-    console.log('Saving attendance:', attendanceList);
-    console.log('Request payload:', {
-      date: selectedDate,
-      attendanceData: attendanceList,
-      CRcode: classData?.CRcode || 'unknown'
-    });
+
     
     try {
-      const response = await fetch('http://localhost:4000/fetures/save-attendance', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/save-attendance`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -116,7 +106,6 @@ function Grid({ students = [], onSaveAttendance, classData }) {
         alert(result.msg || 'Failed to save attendance');
       }
     } catch (error) {
-      console.error('Error saving attendance:', error);
       alert('Network error. Please try again.');
     }
   };
@@ -135,7 +124,7 @@ function Grid({ students = [], onSaveAttendance, classData }) {
   return (
     <div>
       <div className="text-2xl font-bold text-center mt-10 text-[#356AC3] text-4xl">Student Attendance</div>
-      <div className="text-gray-500 text-center mt-2">Take Attendance in smarter way</div>
+      <div className="text-gray-500 text-center mt-2">Vision Classroom - Take Attendance in smarter way</div>
 
       <div className="flex items-center gap-4 mt-8 ml-[560px]">
         <label className="text-lg font-medium">Select Date:</label>

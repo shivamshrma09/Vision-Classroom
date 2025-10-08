@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Bold, Italic, Underline, Link, Calendar, Users, ChevronDown, Paperclip, MessageCircle, ThumbsUp, Share, FileText, Send, Upload, Image } from 'lucide-react'
 
-// Assignment Display Component
 function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, setShowSubmissions, submissions, onSubmit, isTeacher, classData, onCommentAdded }) {
 
   const [showComments, setShowComments] = useState(false)
@@ -20,7 +19,7 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
         return
       }
       
-      const response = await fetch('http://localhost:4000/fetures/assignment-comment', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/assignment-comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -61,7 +60,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-4">
-      {/* Assignment Header */}
       <div className="p-3 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -77,7 +75,7 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
             <button 
               onClick={async () => {
                 try {
-                  const response = await fetch(`http://localhost:4000/fetures/assignment-submissions/${assignment._id}?CRcode=${classData?.CRcode}`)
+                  const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/assignment-submissions/${assignment._id}?CRcode=${classData?.CRcode}`)
                   const result = await response.json()
                   
                   if (response.ok) {
@@ -101,7 +99,7 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
   <button 
     onClick={async () => {
       try {
-        const response = await fetch(`http://localhost:4000/fetures/assignment-submissions/${assignment._id}?CRcode=${classData?.CRcode}`)
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/assignment-submissions/${assignment._id}?CRcode=${classData?.CRcode}`)
         const result = await response.json()
         
         if (response.ok) {
@@ -125,14 +123,12 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
         </div>
       </div>
 
-      {/* Assignment Content */}
       <div className="p-3">
         {assignment.title && (
           <h3 className="text-base font-semibold text-gray-900 mb-2">{assignment.title}</h3>
         )}
         <p className="text-gray-800 leading-relaxed mb-3 text-sm">{assignment.description}</p>
         
-        {/* Schedule Time Display */}
         {assignment.scheduleTime && (
           <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center space-x-2">
@@ -151,7 +147,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
           </div>
         )}
         
-        {/* Uploaded Image - Compact Display */}
         {assignment.file && assignment.file.contentType && assignment.file.contentType.startsWith('image/') && (
           <div className="mt-3 mb-3">
             <img 
@@ -163,7 +158,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
           </div>
         )}
 
-        {/* File Attachment (Non-Image) */}
         {assignment.file && !assignment.file.contentType.startsWith('image/') && (
           <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
             <div className="bg-gray-50 px-3 py-2 border-b border-gray-200">
@@ -184,7 +178,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
           </div>
         )}
         
-        {/* Links */}
         {assignment.links && (
           <div className="mt-3 border border-gray-200 rounded-md overflow-hidden">
             <div className="bg-gray-50 px-3 py-1.5 border-b border-gray-200">
@@ -206,7 +199,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
 
       </div>
 
-      {/* Assignment Actions */}
       <div className="px-3 py-2 border-t border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
@@ -237,10 +229,8 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
         </div>
       </div>
 
-      {/* Comments Section */}
       {showComments && (
         <div className="border-t border-gray-100">
-          {/* Add Comment */}
           <div className="p-4 border-b border-gray-100">
             <div className="flex space-x-3">
               <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -271,7 +261,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
             </div>
           </div>
 
-          {/* Comments List */}
           <div className="p-4 space-y-3">
             {comments.map(comment => {
               const getInitials = (name) => {
@@ -297,7 +286,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
         </div>
       )}
 
-      {/* Submission Modal */}
       {showSubmissionModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
@@ -368,7 +356,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
                     formData.append('CRcode', classData?.CRcode)
                     
                     if (submissionFile) {
-                      // Convert base64 to blob for FormData
                       const byteCharacters = atob(submissionFile.data)
                       const byteNumbers = new Array(byteCharacters.length)
                       for (let i = 0; i < byteCharacters.length; i++) {
@@ -379,7 +366,7 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
                       formData.append('file', blob, submissionFile.originalName)
                     }
                     
-                    const response = await fetch('http://localhost:4000/fetures/submit-assignment', {
+                    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/submit-assignment`, {
                       method: 'POST',
                       body: formData
                     })
@@ -409,7 +396,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
         </div>
       )}
 
-      {/* Submissions List Modal */}
       {showSubmissions && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-96 overflow-y-auto">
@@ -440,7 +426,6 @@ function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, set
                     {submission.file && (
                       <button 
                         onClick={() => {
-                          // Create download link for base64 file
                           const byteCharacters = atob(submission.file.data)
                           const byteNumbers = new Array(byteCharacters.length)
                           for (let i = 0; i < byteCharacters.length; i++) {
@@ -493,7 +478,7 @@ function Assignment({ assignments = [] }) {
       const reader = new FileReader()
       reader.onload = (e) => {
         setSelectedFile({
-          data: e.target.result.split(',')[1], // Remove data:type;base64, prefix
+          data: e.target.result.split(',')[1], 
           contentType: file.type,
           originalName: file.name
         })
@@ -532,9 +517,7 @@ function Assignment({ assignments = [] }) {
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white">
-      {/* Assignment Card */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -580,7 +563,6 @@ function Assignment({ assignments = [] }) {
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="p-4">
           <input
             type="text"
@@ -596,7 +578,6 @@ function Assignment({ assignments = [] }) {
             className="w-full min-h-32 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#356AC3] focus:border-transparent text-gray-700"
           />
           
-          {/* File Upload */}
           <div className="mt-3 p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-[#356AC3] transition-colors">
             <input
               type="file"
@@ -614,7 +595,6 @@ function Assignment({ assignments = [] }) {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="flex items-center justify-between p-4 border-t border-gray-100">
           <div className="flex items-center space-x-3">
             <span className="text-sm text-gray-500">Shivam Kumar</span>
@@ -634,7 +614,6 @@ function Assignment({ assignments = [] }) {
         </div>
       </div>
 
-      {/* Additional Options */}
       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
         <h3 className="text-sm font-medium text-gray-700 mb-3">{contentType === 'assignment' ? 'Assignment Options' : 'Study Material Options'}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -661,7 +640,6 @@ function Assignment({ assignments = [] }) {
         </div>
       </div>
       
-      {/* Display Created Assignments */}
       <div className="mt-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Recent Posts</h2>
         {createdAssignments.length === 0 ? (

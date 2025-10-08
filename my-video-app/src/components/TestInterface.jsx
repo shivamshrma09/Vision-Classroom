@@ -53,7 +53,6 @@ function TestInterface({ test, onExit, classData }) {
   }
 
   const handleSubmit = async () => {
-    // Calculate score
     let score = 0;
     const totalQuestions = test.questions?.length || 0;
     
@@ -75,7 +74,6 @@ function TestInterface({ test, onExit, classData }) {
       }
     });
     
-    // Submit result to backend
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const studentName = user.name || 'Anonymous Student';
@@ -95,7 +93,7 @@ function TestInterface({ test, onExit, classData }) {
       
       console.log('Submitting test result:', resultData);
       
-      const response = await fetch('http://localhost:4000/fetures/submit-test-result', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/submit-test-result`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -199,7 +197,6 @@ function TestInterface({ test, onExit, classData }) {
       </div>
 
       <div style={{ display: 'flex', maxWidth: '1200px', margin: '0 auto', gap: '24px', padding: '24px' }}>
-        {/* Sidebar */}
         {showSidebar && (
           <div style={{ width: '280px', background: 'white', borderRadius: '12px', padding: '20px', height: 'fit-content', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
@@ -261,7 +258,6 @@ function TestInterface({ test, onExit, classData }) {
           </div>
         )}
 
-        {/* Main Content */}
         <div style={{ flex: 1 }}>
           <div style={{ background: 'white', borderRadius: '12px', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
             {question && (
@@ -352,7 +348,6 @@ function TestInterface({ test, onExit, classData }) {
             )}
           </div>
 
-          {/* Navigation */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px' }}>
             <button
               onClick={() => setCurrentQuestion(prev => Math.max(0, prev - 1))}

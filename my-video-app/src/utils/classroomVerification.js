@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 
-// Classroom access verification utility
 
 export const verifyClassroomAccess = async (userId, classroomId) => {
   try {
-    // Get user data from backend to check classroomcodes
-    const response = await fetch(`http://localhost:4000/users/profile/${userId}`, {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/users/profile/${userId}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
@@ -18,7 +16,6 @@ export const verifyClassroomAccess = async (userId, classroomId) => {
     const userData = await response.json();
     console.log('User data for verification:', userData);
     
-    // Check if classroomId exists in user's classroomcodes array
     const hasAccess = userData.classroomcodes && userData.classroomcodes.includes(classroomId);
     
     return {
@@ -36,7 +33,6 @@ export const verifyClassroomAccess = async (userId, classroomId) => {
   }
 };
 
-// React hook for classroom verification
 export const useClassroomVerification = (classroomId) => {
   const [verificationStatus, setVerificationStatus] = useState({
     isLoading: true,

@@ -22,7 +22,7 @@ const upload = multer({
             cb(new Error('Only images (PNG, JPG) and PDFs are allowed!'), false); 
         }
     },
-    limits: { fileSize: 5 * 1024 * 1024 } // Limit file size to 5MB
+    limits: { fileSize: 5 * 1024 * 1024 } 
 });
 
 router.post('/post', upload.single("image"), (req, res, next) => {

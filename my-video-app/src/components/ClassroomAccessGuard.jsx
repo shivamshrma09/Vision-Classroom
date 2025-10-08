@@ -14,7 +14,6 @@ const ClassroomAccessGuard = ({ children }) => {
   useEffect(() => {
     const verifyAccess = async () => {
       try {
-        // Get user from localStorage
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const userId = user._id || user.id;
         
@@ -29,8 +28,7 @@ const ClassroomAccessGuard = ({ children }) => {
 
         console.log('Verifying access for user:', userId, 'classroom:', classroomId);
 
-        // Fetch user profile to check classroomcodes
-        const response = await fetch(`http://localhost:4000/users/profile`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/users/profile`, {
           headers: {
             'token': localStorage.getItem('token')
           }
@@ -43,7 +41,6 @@ const ClassroomAccessGuard = ({ children }) => {
         const userData = await response.json();
         console.log('User profile data:', userData);
 
-        // Check if classroom ID exists in user's classroomcodes array
         const hasAccess = userData.classroomcodes && userData.classroomcodes.includes(classroomId);
         
         console.log('Access check result:', {
@@ -83,7 +80,6 @@ const ClassroomAccessGuard = ({ children }) => {
     }
   }, [classroomId]);
 
-  // Loading state
   if (verificationStatus.isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -95,7 +91,6 @@ const ClassroomAccessGuard = ({ children }) => {
     );
   }
 
-  // Access denied
   if (!verificationStatus.hasAccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -126,7 +121,6 @@ const ClassroomAccessGuard = ({ children }) => {
     );
   }
 
-  // Access granted - render children
   return children;
 };
 

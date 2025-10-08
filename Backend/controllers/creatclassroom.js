@@ -3,7 +3,6 @@ const CreatedclassroomModel = require("../models/createdclassroomModel");
 
 const { nanoid } = require('nanoid');
 
-//delet it when frontend ready
 const generateUniqueClassroomCode = () => {
   return nanoid(7); 
 };
@@ -45,7 +44,6 @@ if(!adminname || !adminId ||!CRName ){
 
 
 
-// Function to generate random student ID
 const generateStudentId = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
@@ -92,17 +90,13 @@ async function joinclassroom(req, res) {
       return res.status(400).json({ msg: "Already joined this classroom" });
     }
 
-    // Generate unique student ID
     const studentId = generateStudentId();
-
-    // Add classroom to user's classroom codes
     const updatedUser = await userModel.findByIdAndUpdate(
       adminId, 
       { $push: { classroomcodes: classroom._id } }, 
       { new: true }
     );
 
-    // Add student to classroom with generated ID and name from database
     const addStudent = await CreatedclassroomModel.findOneAndUpdate(
       { CRcode: CRcode },
       { 
@@ -144,32 +138,23 @@ async function getclassroomdata(req, res) {
       return res.status(400).json({ message: "User ID required" });
     }
     
-    // Find user to get classroom IDs
     const user = await userModel.findById(userid);
     
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     
-    // Get all classroom IDs from user
     const allClassroomIds = user.classroomcodes || [];
     
-    // Fetch all classrooms in one query
     const allClassrooms = await CreatedclassroomModel.find({
       _id: { $in: allClassroomIds }
     });
     
-    // For each classroom, fetch related data
     const classroomsWithData = await Promise.all(
       allClassrooms.map(async (classroom) => {
         const isAdmin = classroom.adminId.toString() === userid.toString();
         
-        // You'll need to create these models/collections
-        // const posts = await PostModel.find({ classroomId: classroom._id });
-        // const assignments = await AssignmentModel.find({ classroomId: classroom._id });
-        // const tests = await TestModel.find({ classroomId: classroom._id });
-        
-        // For now, using mock data - replace with actual queries
+     
         const posts = [];
         const assignments = [];
         const tests = [];
@@ -223,7 +208,7 @@ async function getclassroomdataenter(req, res) {
     }
 
     const posts = classroom.posts || [];
-    const assignments = classroom.aassignmets || []; // Note: typo in model 'aassignmets'
+    const assignments = classroom.aassignmets || []; 
     const tests = classroom.tests || [];
     const materials = classroom.materials || [];
     

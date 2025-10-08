@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Bold, Italic, Underline, Link, Calendar, Users, ChevronDown, Paperclip, MessageCircle, ThumbsUp, Share, FileText, Send } from 'lucide-react'
 
-// Post Display Component
 function PostDisplay({ post, classData, onCommentAdded }) {
   const [showComments, setShowComments] = useState(false)
   const [newComment, setNewComment] = useState('')
@@ -12,7 +11,7 @@ function PostDisplay({ post, classData, onCommentAdded }) {
     
     try {
       const user = JSON.parse(localStorage.getItem('user') )
-      const response = await fetch('http://localhost:4000/fetures/comment', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -67,7 +66,6 @@ function PostDisplay({ post, classData, onCommentAdded }) {
         </div>
       </div>
 
-      {/* Post Content */}
       <div className="p-4">
         {post.title && (
           <h3 className="text-lg font-semibold text-gray-900 mb-3">{post.title}</h3>
@@ -76,7 +74,6 @@ function PostDisplay({ post, classData, onCommentAdded }) {
           <p className="text-gray-800 leading-relaxed whitespace-pre-wrap mb-3">{post.content}</p>
         )}
         
-        {/* Schedule Time Display */}
         {post.scheduleTime && (
           <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center space-x-2">
@@ -95,11 +92,9 @@ function PostDisplay({ post, classData, onCommentAdded }) {
           </div>
         )}
         
-        {/* File Display */}
         {post.file && post.file.data && (
           <div className="mt-3">
             {post.file.contentType && post.file.contentType.startsWith('image/') ? (
-              // Image Display
               <div>
                 <img 
                   src={`data:${post.file.contentType};base64,${post.file.data}`}
@@ -112,7 +107,6 @@ function PostDisplay({ post, classData, onCommentAdded }) {
                 )}
               </div>
             ) : (
-              // PDF/Document Display
               <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-red-500 rounded flex items-center justify-center">
@@ -139,10 +133,8 @@ function PostDisplay({ post, classData, onCommentAdded }) {
           </div>
         )}
         
-        {/* Links Row */}
         {(post.youtubeLink || post.links) && (
           <div className="mt-3 flex gap-3">
-            {/* YouTube Link */}
             {post.youtubeLink && (
               <div className="flex-1 border border-gray-200 rounded-md overflow-hidden">
                 <div className="bg-gray-50 px-3 py-1.5 border-b border-gray-200">
@@ -157,7 +149,6 @@ function PostDisplay({ post, classData, onCommentAdded }) {
               </div>
             )}
             
-            {/* External Links */}
             {post.links && (
               <div className="flex-1 border border-gray-200 rounded-md overflow-hidden">
                 <div className="bg-gray-50 px-3 py-1.5 border-b border-gray-200">
@@ -180,7 +171,6 @@ function PostDisplay({ post, classData, onCommentAdded }) {
         )}
       </div>
 
-      {/* Post Actions */}
       <div className="px-4 py-3 border-t border-gray-100">
         <div className="flex items-center space-x-6">
           <button className="flex items-center space-x-2 text-gray-600 hover:text-[#356AC3] transition-colors">
@@ -201,10 +191,8 @@ function PostDisplay({ post, classData, onCommentAdded }) {
         </div>
       </div>
 
-      {/* Comments Section */}
       {showComments && (
         <div className="border-t border-gray-100">
-          {/* Add Comment */}
           <div className="p-4 border-b border-gray-100">
             <div className="flex space-x-3">
               <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -229,7 +217,6 @@ function PostDisplay({ post, classData, onCommentAdded }) {
             </div>
           </div>
 
-          {/* Comments List */}
           <div className="p-4 space-y-3">
             {comments.map(comment => (
               <div key={comment.id} className="flex space-x-3">
@@ -279,7 +266,6 @@ function Post({ onCreate }) {
       onCreate(newPost)
     }
     
-    // Reset form
     setPostTitle('')
     setPostContent('')
     setYoutubeLink('')
@@ -289,9 +275,7 @@ function Post({ onCreate }) {
 
   return (
     <div className="w-full h-full overflow-y-auto">
-      {/* Post Card */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-[#356AC3] flex items-center justify-center">
@@ -329,7 +313,6 @@ function Post({ onCreate }) {
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="p-4">
           <input
             type="text"
@@ -346,7 +329,6 @@ function Post({ onCreate }) {
               className="w-full min-h-32 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#356AC3] focus:border-transparent text-gray-700"
             />
             
-            {/* Formatting Toolbar */}
             <div className="absolute bottom-3 left-3 flex items-center space-x-1 bg-white border border-gray-200 rounded-lg px-2 py-1 shadow-sm">
               <button className="p-1 hover:bg-gray-100 rounded transition-colors">
                 <Bold className="w-3 h-3 text-gray-600" />
@@ -365,7 +347,6 @@ function Post({ onCreate }) {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="flex items-center justify-between p-4 border-t border-gray-100">
           <div className="flex items-center space-x-3">
             <span className="text-sm text-gray-500">Shivam Kumar</span>
@@ -385,7 +366,6 @@ function Post({ onCreate }) {
         </div>
       </div>
 
-      {/* Additional Options */}
       <div className="mt-3 p-3 bg-gray-50 rounded-lg">
         <h3 className="text-xs font-medium text-gray-700 mb-2">Additional Options</h3>
         <div className="grid grid-cols-2 gap-2">

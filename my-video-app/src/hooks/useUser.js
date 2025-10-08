@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: process.env.BACKEND_BASE_URL || 'http://localhost:4000'
+  baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'
 });
 
 export const useUser = () => {

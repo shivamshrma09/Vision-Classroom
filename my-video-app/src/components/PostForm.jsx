@@ -55,9 +55,7 @@ function PostForm({ onCreate, classData }) {
 
   return (
     <div className="w-full h-full overflow-y-auto">
-      {/* Post Card */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-[#356AC3] flex items-center justify-center">
@@ -95,7 +93,6 @@ function PostForm({ onCreate, classData }) {
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="p-4">
           <input
             type="text"
@@ -112,7 +109,6 @@ function PostForm({ onCreate, classData }) {
               className="w-full min-h-32 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#356AC3] focus:border-transparent text-gray-700"
             />
             
-            {/* Formatting Toolbar */}
             <div className="absolute bottom-3 left-3 flex items-center space-x-1 bg-white border border-gray-200 rounded-lg px-2 py-1 shadow-sm">
               <button className="p-1 hover:bg-gray-100 rounded transition-colors">
                 <Bold className="w-3 h-3 text-gray-600" />
@@ -131,7 +127,6 @@ function PostForm({ onCreate, classData }) {
           </div>
         </div>
 
-        {/* Footer Actions */}
         <div className="flex items-center justify-between p-4 border-t border-gray-100">
           <div className="flex items-center space-x-3">
             <span className="text-sm text-gray-500">Shivam Kumar</span>
@@ -157,7 +152,6 @@ function PostForm({ onCreate, classData }) {
         </div>
       </div>
 
-      {/* Additional Options */}
       <div className="mt-3 p-3 bg-gray-50 rounded-lg">
         <h3 className="text-xs font-medium text-gray-700 mb-2">Additional Options</h3>
         <div className="grid grid-cols-2 gap-2">

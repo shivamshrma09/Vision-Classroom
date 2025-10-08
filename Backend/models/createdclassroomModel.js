@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose; // Schema को सही तरीके से आयात करें
+const { Schema } = mongoose;
 
 const PostSchema = new Schema({
     uniqueId: {
@@ -134,21 +134,21 @@ const question = new Schema({
     type: {
         type: String,
         enum: [
-            'multiple_choice', // Multiple choice
-            'checkboxes',      // Checkboxes
-            'dropdown',        // Dropdown
-            'file_upload',     // File upload
-            'linear_scale',    // Linear scale
-            'rating',          // Rating
-            'date',            // Date
-            'time'             // Time
+            'multiple_choice',
+            'checkboxes',
+            'dropdown',
+            'file_upload',
+            'linear_scale',
+            'rating',
+            'date',
+            'time'
         ]
     },
     options: {
-        type: [String], // Array of options (for multiple choice, checkboxes, dropdown)
+        type: [String],
         default: []
     },
-    answer: String, // Correct answer (if applicable)
+    answer: String,
     file: { // Optional file for file upload questions
         data: String,
         contentType: String,
@@ -183,7 +183,7 @@ const result = new Schema({
         required: false
     },
     options: {
-        type: [String], // Fixed typo: Changed `Strings` to `String`
+        type: [String]
     },
     numberofcorrect: String,
     cheatingpercetage: String,
@@ -207,8 +207,8 @@ const test = new Schema({
     description: {
         type: String
     },
-    questions: [question], // Array of questions
-    results: [result], // Array of results
+    questions: [question],
+    results: [result],
     scheduleTime: {
         type: Date
     },

@@ -9,17 +9,14 @@ async function getprofile(req, res) {
       return res.status(401).json({ message: "Token required" });
     }
     
-    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
-    // Find user by ID from token
     const user = await userModel.findById(decoded._id);
     
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     
-    // Remove password and return user data
     const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;
     

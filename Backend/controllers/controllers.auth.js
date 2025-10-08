@@ -1,5 +1,5 @@
 const OtpModel = require("../models/OtpModel");
-const userModel = require("../models/userModel"); // सुनिश्चित करें कि आपने userModel भी बनाया है
+const userModel = require("../models/userModel"); 
 const crypto = require("crypto");
 const nodemailer = require('nodemailer'); 
 const jwt = require('jsonwebtoken');
@@ -77,17 +77,14 @@ async function getprofile(req, res) {
       return res.status(401).json({ message: "Token required" });
     }
     
-    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
     
-    // Find user by ID from token
     const user = await userModel.findById(decoded._id);
     
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     
-    // Remove password and return user data
     const userWithoutPassword = user.toObject();
     delete userWithoutPassword.password;
     
@@ -142,10 +139,10 @@ async function Otpsender(req, res) {
 
     const mailOptions = {
       from: process.env.SENDER_EMAIL, 
-      to: `${name} <${email}>`, // Recipient's name and email address.
-      replyTo: process.env.REPLY_TO, // Sets the email address for recipient responses.
-      subject: "Classroom Mitra OTP",// Subject line.
-      text: "Your OTP is"  +  " "+ `${otp}`, // Plaintext body.
+      to: `${name} <${email}>`, 
+      replyTo: process.env.REPLY_TO, 
+      subject: "Vision Classroom OTP",
+      text: "Your OTP is"  +  " "+ `${otp}`, 
     };
 
     const info = await transporter.sendMail(mailOptions)

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Star, MessageSquare, Send } from 'lucide-react'
 
-// Feedback Display Component
+
 function FeedbackDisplay({ feedback }) {
   const renderStars = (rating) => {
     return [...Array(5)].map((_, i) => (
@@ -62,36 +62,7 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Mock feedback data
-  const [feedbacks] = useState([
-    {
-      id: 1,
-      studentName: 'Rahul Sharma',
-      category: 'Teaching',
-      rating: 5,
-      message: 'Excellent explanation of complex topics. The examples were very helpful.',
-      suggestions: 'Maybe add more practice problems.',
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-    },
-    {
-      id: 2,
-      studentName: 'Priya Singh',
-      category: 'Course Content',
-      rating: 4,
-      message: 'Good course structure and materials. Easy to follow.',
-      suggestions: 'Include more real-world examples.',
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
-    },
-    {
-      id: 3,
-      studentName: 'Anonymous',
-      category: 'Communication',
-      rating: 3,
-      message: 'Sometimes difficult to understand. Could speak slower.',
-      suggestions: 'Use more visual aids during explanations.',
-      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-    }
-  ])
+
 
   const handleSubmitFeedback = async () => {
     if (!message.trim() || !subject.trim()) {
@@ -102,7 +73,7 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
     setIsSubmitting(true)
     
     try {
-      // Try different possible localStorage keys
+
       let user = JSON.parse(localStorage.getItem('user') || '{}')
       if (!user.id) {
         user = JSON.parse(localStorage.getItem('userData') || '{}')
@@ -111,22 +82,21 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
         user = JSON.parse(localStorage.getItem('currentUser') || '{}')
       }
       
-      console.log('User from localStorage:', user)
-      console.log('All localStorage keys:', Object.keys(localStorage))
+
       
-      // Check different possible user ID fields (login stores as _id)
+
       const userId = user._id || user.id || user.userId || user.uid
       const userName = user.name || user.username || user.fullName || user.displayName
       
-      // Fallback to props if localStorage is empty
+
       let finalUserId = userId || currentUserId
       let finalUserName = userName || currentUserName
       
-      // Temporary fix: use teacher ID from your logs if no user found
+
       if (!finalUserId) {
-        finalUserId = '68e547d49f55129c67b0d8cb' // Teacher ID from your console logs
+        finalUserId = '68e547d49f55129c67b0d8cb'
         finalUserName = 'Teacher'
-        console.log('Using temporary teacher ID for testing')
+
       }
       
       const feedbackData = {
@@ -139,9 +109,9 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
         CRcode: classData?.CRcode
       }
       
-      console.log('Submitting feedback:', feedbackData)
+
       
-      const response = await fetch('http://localhost:4000/fetures/submit-feedback', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/submit-feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -149,13 +119,11 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
         body: JSON.stringify(feedbackData)
       })
       
-      console.log('Response status:', response.status)
       const result = await response.json()
-      console.log('Response result:', result)
       
       if (response.ok) {
         alert('Feedback submitted successfully!')
-        // Reset form
+
         setStudentName('')
         setSubject('')
         setCategory('general')
@@ -167,11 +135,9 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
           onCreate(result.feedback)
         }
       } else {
-        console.error('Feedback submission failed:', result)
         alert(result.msg || 'Failed to submit feedback')
       }
     } catch (error) {
-      console.error('Error submitting feedback:', error)
       alert('Network error. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -180,9 +146,9 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
 
   return (
     <div className="w-full h-full overflow-y-auto">
-      {/* Feedback Form Card */}
+
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-        {/* Header */}
+
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-[#356AC3] flex items-center justify-center">
@@ -195,7 +161,7 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
           </div>
         </div>
 
-        {/* Content Area */}
+
         <div className="p-4">
           <div className="mb-3">
             <label className="block text-sm font-medium text-gray-600 mb-1">Subject</label>
@@ -284,7 +250,7 @@ function Feedback({ onCreate, classData, currentUserId, currentUserName }) {
 
         </div>
 
-        {/* Footer Actions */}
+
         <div className="flex items-center justify-between p-4 border-t border-gray-100">
           <div className="flex items-center space-x-3">
             <span className="text-sm text-gray-500">Student Feedback</span>

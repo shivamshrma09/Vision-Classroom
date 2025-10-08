@@ -5,12 +5,12 @@ import axios from "axios";
 import { useUser } from "../hooks/useUser";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.BACKEND_BASE_URL || "http://localhost:4000",
+  baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000',
 });
 
 function Classroomenter() {
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState(""); // 'create' or 'join'
+  const [modalType, setModalType] = useState(""); 
   const [cRcode, setCRcode] = useState("");
   const [classroomsdata, setClassroomsdata] = useState("");
   const [cRName, setCRName] = useState("");
@@ -35,7 +35,7 @@ const [userollnumber , setUserollnumber] = useState("");
       const token = localStorage.getItem("token");
 
       if (!token) {
-        alert("Pleaswe login first");
+        alert("Please login first");
         return;
       }
 
@@ -44,31 +44,48 @@ const [userollnumber , setUserollnumber] = useState("");
         return;
       }
 
+      const userId = user.id || user._id;
+      console.log('Creating classroom with user:', user);
+      console.log('User ID:', userId);
+      console.log('Backend URL:', process.env.REACT_APP_BACKEND_URL);
+      
       const response = await axiosInstance.post("/classroom/creat-classroom", {
         adminname: user.name,
-        adminId:   user._id,
+        adminId: userId,
         CRName: cRName,
         CRDescription: cRDescription,
         CRsubject: cRsubject,
       });
-       console.log( user.id || user._id)
-      console.log("classroom created  successfully:", response.data);
-      alert("created  successful!");
+      
+      console.log("classroom created successfully:", response.data);
+      alert("Classroom created successfully!");
       setShowModal(false);
       setCRName('');
       setCRDescription('');
       setCRsubject('');
-      classroomdata(); // Refresh classroom data
+      classroomdata(); 
     } catch (error) {
-      console.error("Login error:", error.response?.data || error.message);
-      alert("Login failed!");
+      console.error("Create classroom error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error message:", error.message);
+      
+      if (error.response?.status === 404) {
+        alert("Backend server not found. Please check if the server is running.");
+      } else if (error.response?.data?.msg) {
+        alert(`Error: ${error.response.data.msg}`);
+      } else {
+        alert(`Failed to create classroom: ${error.message}`);
+      }
     }
   };
 
   const classroomdata = async () => {
     try {
+      const userId = user.id || user._id;
+      console.log('Fetching classroom data for user:', userId);
+      
       const response = await axiosInstance.post("/classroom/classroom-data", {
-        userid: user.id || user._id,
+        userid: userId,
       });
       const classroomData = response.data;
       setClassroomsdata(classroomData);
@@ -85,7 +102,7 @@ const [userollnumber , setUserollnumber] = useState("");
       const token = localStorage.getItem("token");
 
       if (!token) {
-        alert("Pleaswe login first");
+        alert("Please login first");
         return;
       }
 
@@ -94,31 +111,54 @@ const [userollnumber , setUserollnumber] = useState("");
         return;
       }
 
-
-
-       
+      const userId = user.id || user._id;
+      console.log('Joining classroom with user:', user);
+      console.log('User ID:', userId);
+      console.log('Backend URL:', process.env.REACT_APP_BACKEND_URL);
       
       const response = await axiosInstance.post("/classroom/join-classroom", {
-        adminId: user._id,
+        adminId: userId,
         CRcode: cRcode,
-        userollnumber:userollnumber
+        userollnumber: userollnumber
       });
 
-      console.log("classroom join  successfully:", response.data);
-      alert("join  successful!");
+      console.log("classroom joined successfully:", response.data);
+      alert("Joined classroom successfully!");
       setShowModal(false);
       setCRcode('');
-      classroomdata(); // Refresh classroom data
+      setUserollnumber('');
+      classroomdata(); 
     } catch (error) {
-      console.error(" error:", error.response?.data || error.message);
-      alert("join failed!");
+      console.error("Join classroom error:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error message:", error.message);
+      
+      if (error.response?.status === 404) {
+        alert("Backend server not found. Please check if the server is running.");
+      } else if (error.response?.data?.msg) {
+        alert(`Error: ${error.response.data.msg}`);
+      } else {
+        alert(`Failed to join classroom: ${error.message}`);
+      }
     }
   };
 
 
 
 
+// Test backend connectivity
+const testBackendConnection = async () => {
+  try {
+    const response = await axiosInstance.get('/');
+    console.log('Backend connection successful:', response.data);
+  } catch (error) {
+    console.error('Backend connection failed:', error.message);
+    console.error('Make sure backend server is running on port 4000');
+  }
+};
+
 useEffect(() => {
+  testBackendConnection();
   if (user && !loading) {
     classroomdata();
   }
@@ -140,8 +180,7 @@ useEffect(() => {
         }}
       >
 
-        {/* <button onClick={classroomdata} style={{marginBottom:20, padding: "10px 20px", backgroundColor: "#356AC3", color: "white", border: "none", borderRadius: "5px", cursor: "pointer"}}></button> */}
-        {/* Plus Button */}
+        
         <div
           style={{
             position: "fixed",
@@ -243,13 +282,7 @@ useEffect(() => {
             justifyItems: "center",
           }}
         >
-          {/* <ClassroomCard classData={{
-            name: "English Literature",
-            createdDate: "December 8, 2024",
-            studentCount: 22,
-            classCode: "ENG12A",
-            description: "Advanced English literature course focusing on classic and contemporary works for 12th grade students."
-          }} /> */}
+         
 
 {classroomsdata?.classrooms?.map((classroom) => (
   <ClassroomCard
@@ -273,7 +306,6 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* Modal */}
       {(modalType === "create" || modalType === "join") && (
         <div
           style={{
