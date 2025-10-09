@@ -105,7 +105,7 @@ async function Otpsender(req, res) {
 
     const otp = crypto.randomInt(100000, 999999);
 
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false,
