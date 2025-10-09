@@ -25,27 +25,92 @@ function Singup() {
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [strem, setStrem] = useState('');
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 6;
+  };
+
+  const sendOtp = async () => {
+    if (!name || !email) {
+      alert('Please enter name and email first');
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const response = await axiosInstance.post("/users/send-emails", {
+        name,
+        email
+      });
+      
+      if (response.data.status === 'success') {
+        setOtpSent(true);
+        alert('OTP sent to your email!');
+      }
+    } catch (error) {
+      alert('Failed to send OTP!');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!name || !email || !password || !role) {
+      alert('Please fill all required fields');
+      return;
+    }
+    
+    if (!validatePassword(password)) {
+      alert('Password must be at least 6 characters');
+      return;
+    }
+    
+    if (!termsAccepted) {
+      alert('Please accept Terms and Conditions');
+      return;
+    }
+    
+    if (!otpSent) {
+      alert('Please send OTP first');
+      return;
+    }
+    
+    if (!otp) {
+      alert('Please enter OTP');
+      return;
+    }
+    
+    setLoading(true);
     try {
       const response = await axiosInstance.post("/users/register", { 
         name,
         role,
         strem,
         email,
-        password
+        password,
+        otpuserenter: otp
       });   
-
-      
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         
-
         const userData = {
           name: response.data.user?.name || name,
           email: response.data.user?.email || email,
@@ -63,7 +128,9 @@ function Singup() {
         navigate('/login');
       }
     } catch (error) {
-      alert('Signup failed!');
+      alert('Signup failed! ' + (error.response?.data || 'Please try again'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -148,10 +215,38 @@ function Singup() {
               />
             </div>
             
-
+            <div className="grid gap-2">
+              <Label htmlFor="otp">OTP</Label>
+              <div className="flex gap-2">
+                <Input 
+                  id="otp" 
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  disabled={!otpSent}
+                />
+                <Button 
+                  type="button"
+                  onClick={sendOtp}
+                  disabled={loading || otpSent}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {loading ? 'Sending...' : otpSent ? 'Sent' : 'Send OTP'}
+                </Button>
+              </div>
+              {otpSent && (
+                <p className="text-sm text-green-600">OTP sent to your email!</p>
+              )}
+            </div>
 
             <div className="flex items-center space-x-2">
-              <input type="checkbox" id="terms" required />
+              <input 
+                type="checkbox" 
+                id="terms" 
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                required 
+              />
               <label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 I agree to the Terms and Conditions
               </label>
@@ -160,8 +255,9 @@ function Singup() {
             <Button 
               className="w-full bg-[#356AC3] hover:bg-[#356AC3]/90 mb-4"
               onClick={handleSubmit}
+              disabled={loading || !otpSent || !termsAccepted}
             >
-              Sign up
+              {loading ? 'Signing up...' : 'Sign up'}
             </Button>
             
 
