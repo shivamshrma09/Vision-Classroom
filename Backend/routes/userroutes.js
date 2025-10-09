@@ -30,7 +30,7 @@ router.post('/login', [
 
 router.get('/profile',  controllersauth.getprofile);
 
-router.post("/send-emails" , controllersauth.Otpsender)
+
 
 
 

@@ -1,27 +1,13 @@
-const OtpModel = require("../models/OtpModel");
 const userModel = require("../models/UserModel"); 
-const crypto = require("crypto");
-const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
 async function Singup(req, res) {
-  const { email, password, role, otpuserenter, name, strem } = req.body;
+  const { email, password, role, name, strem } = req.body;
   
-  const Otpuserexiste = await OtpModel.findOne({ email });
-  if (!Otpuserexiste) {
-    return res.status(404).send("Invalid or expired OTP");
-  }
-
-  const otpExpiresAt = Otpuserexiste.createdAt.getTime() + 5 * 60 * 1000;
-
-  if (otpExpiresAt < Date.now() || Otpuserexiste.otp !== otpuserenter) {
-    return res.send("Invalid or expired OTP");
-  }
-
   const userexiste = await userModel.findOne({ email }).select("+password");
 
   if (userexiste) {
-    return res.status(404).send("User already exists");
+    return res.status(400).send("User already exists");
   }
 
   const hashedPassword = await userModel.hashPassword(password);
@@ -34,7 +20,7 @@ async function Singup(req, res) {
   });
 
   const token = user.generateAuthToken();
-  return res.status(201).json({ token, user, mas: "Registration successful" });
+  return res.status(201).json({ token, user, message: "Registration successful" });
 }
 
 async function login(req, res) {
@@ -93,74 +79,8 @@ async function getprofile(req, res) {
   }
 }
 
-async function Otpsender(req, res) {
-  try {
-    const { name, email } = req.body;
-
-    if (!name || !email) {
-      return res
-        .status(400)
-        .json({ status: "error", message: "Missing required fields" });
-    }
-
-    const otp = crypto.randomInt(100000, 999999);
-
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      }
-    });
-
-    const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: email,
-      subject: "Vision Classroom OTP",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #356AC3;">Vision Classroom</h2>
-          <p>Hello ${name},</p>
-          <p>Your OTP for Vision Classroom is:</p>
-          <div style="background-color: #f0f0f0; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; color: #356AC3; border-radius: 5px;">
-            ${otp}
-          </div>
-          <p>This OTP is valid for 5 minutes.</p>
-          <p>If you didn't request this, please ignore this email.</p>
-          <br>
-          <p>Best regards,<br>Vision Classroom Team</p>
-        </div>
-      `
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info.response);
-
-    const addotp = await OtpModel.findOneAndUpdate(
-      { email },
-      { otp, createdAt: new Date() },
-      { upsert: true, new: true }
-    );
-
-    res.status(200).json({ 
-      status: "success", 
-      message: "OTP sent to your email successfully"
-    });
-    
-  } catch (err) {
-    console.error("Error sending email:", err);
-    res.status(500).json({
-      status: "error",
-      message: "Error sending email, please try again.",
-    });
-  }
-}
-
 module.exports = {
   Singup,
   login,
-  getprofile,
-  Otpsender
+  getprofile
 };

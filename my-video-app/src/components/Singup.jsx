@@ -27,8 +27,6 @@ function Singup() {
   const [strem, setStrem] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -40,40 +38,16 @@ function Singup() {
     return password.length >= 6;
   };
 
-  const sendOtp = async () => {
-    if (!name || !email) {
-      alert('Please enter name and email first');
-      return;
-    }
-    
-    if (!validateEmail(email)) {
-      alert('Please enter a valid email address');
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      const response = await axiosInstance.post("/users/send-emails", {
-        name,
-        email
-      });
-      
-      if (response.data.status === 'success') {
-        setOtpSent(true);
-        alert('OTP sent to your email!');
-      }
-    } catch (error) {
-      alert('Failed to send OTP!');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!name || !email || !password || !role) {
       alert('Please fill all required fields');
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      alert('Please enter a valid email address');
       return;
     }
     
@@ -87,16 +61,6 @@ function Singup() {
       return;
     }
     
-    if (!otpSent) {
-      alert('Please send OTP first');
-      return;
-    }
-    
-    if (!otp) {
-      alert('Please enter OTP');
-      return;
-    }
-    
     setLoading(true);
     try {
       const response = await axiosInstance.post("/users/register", { 
@@ -104,8 +68,7 @@ function Singup() {
         role,
         strem,
         email,
-        password,
-        otpuserenter: otp
+        password
       });   
 
       if (response.data.token) {
@@ -133,11 +96,6 @@ function Singup() {
       setLoading(false);
     }
   };
-
-
-  
-          
-
 
   return (
     <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center p-4">
@@ -184,6 +142,7 @@ function Singup() {
               <Input 
                 id="password" 
                 type="password" 
+                placeholder="Enter password (min 6 characters)"
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
               />
@@ -214,30 +173,6 @@ function Singup() {
                 onChange={(e) => setStrem(e.target.value)}
               />
             </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="otp">OTP</Label>
-              <div className="flex gap-2">
-                <Input 
-                  id="otp" 
-                  placeholder="Enter OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  disabled={!otpSent}
-                />
-                <Button 
-                  type="button"
-                  onClick={sendOtp}
-                  disabled={loading || otpSent}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  {loading ? 'Sending...' : otpSent ? 'Sent' : 'Send OTP'}
-                </Button>
-              </div>
-              {otpSent && (
-                <p className="text-sm text-green-600">OTP sent to your email!</p>
-              )}
-            </div>
 
             <div className="flex items-center space-x-2">
               <input 
@@ -255,12 +190,10 @@ function Singup() {
             <Button 
               className="w-full bg-[#356AC3] hover:bg-[#356AC3]/90 mb-4"
               onClick={handleSubmit}
-              disabled={loading || !otpSent || !termsAccepted}
+              disabled={loading || !termsAccepted}
             >
               {loading ? 'Signing up...' : 'Sign up'}
             </Button>
-            
-
 
           </CardContent>
           
