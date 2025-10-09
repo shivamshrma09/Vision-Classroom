@@ -116,6 +116,7 @@ function Singup() {
           </CardHeader>
           
           <CardContent className="grid gap-4">
+            <form onSubmit={handleSubmit}>
             <div className="grid gap-2">
               <Label htmlFor="name">Name</Label>
               <Input 
@@ -194,6 +195,7 @@ function Singup() {
             >
               {loading ? 'Signing up...' : 'Sign up'}
             </Button>
+            </form>
 
           </CardContent>
           
