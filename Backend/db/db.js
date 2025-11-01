@@ -2,10 +2,20 @@ const mongoose = require('mongoose');
 
 
 function connectToDb() {
-    mongoose.connect(process.env.DB_CONNECT
+    const options = {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 45000,
+    };
+    
+    mongoose.connect(process.env.DB_CONNECT, options
     ).then(() => {
         console.log('Connected to DB');
-    }).catch(err => console.log(err));
+    }).catch(err => {
+        console.log('DB Connection Error:', err);
+        process.exit(1);
+    });
 }
 
 

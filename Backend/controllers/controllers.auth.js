@@ -9,11 +9,16 @@ const { sendWelcomeEmail } = require('../services/emailService');
 // Create transporter function
 function createTransporter() {
   return nodemailer.createTransport({
-    service: 'Gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS
-    }
+    },
+    connectionTimeout: 60000,
+    greetingTimeout: 30000,
+    socketTimeout: 60000
   });
 }
 
@@ -59,22 +64,24 @@ async function sendOTP(req, res) {
     // Save new OTP
     await OtpModel.create({ email, otp });
     
-    // Send OTP via email
+    // Send OTP via email using same service as notifications
+    const { sendNotificationEmail } = require('../services/emailService');
+    
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333;">Classroom Mitra - OTP Verification</h2>
+        <h2 style="color: #333;">Classroom Mitra - Account Verification</h2>
         <p>Hello ${name || 'User'},</p>
-        <p>Your OTP for registration is:</p>
+        <p>Your verification code for registration is:</p>
         <div style="background: #f4f4f4; padding: 20px; text-align: center; margin: 20px 0;">
           <h1 style="color: #007bff; font-size: 32px; margin: 0;">${otp}</h1>
         </div>
-        <p>This OTP will expire in 10 minutes.</p>
+        <p>This code will expire in 10 minutes.</p>
         <p>If you didn't request this, please ignore this email.</p>
       </div>
     `;
     
     // Try sending email first
-    const emailSent = await sendEmail(email, 'Classroom Mitra - OTP Verification', emailHtml);
+    const emailSent = await sendEmail(email, 'Classroom Mitra - Account Verification', emailHtml);
     
     if (emailSent) {
       console.log(`✅ Email sent successfully to ${email}`);
@@ -197,7 +204,11 @@ async function googleAuth(req, res) {
     params.append('client_secret', process.env.GOOGLE_CLIENT_SECRET);
     params.append('code', code);
     params.append('grant_type', 'authorization_code');
-    params.append('redirect_uri', process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback');
+    // Dynamic redirect URI based on environment
+    const redirectUri = process.env.NODE_ENV === 'production' 
+      ? 'https://vision-classroom-beryl.vercel.app/auth/google/callback'
+      : process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
+    params.append('redirect_uri', redirectUri);
     
     const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', params, {
       headers: {
@@ -248,7 +259,11 @@ async function linkedinAuth(req, res) {
     params.append('code', code);
     params.append('client_id', process.env.LINKEDIN_CLIENT_ID);
     params.append('client_secret', process.env.LINKEDIN_CLIENT_SECRET);
-    params.append('redirect_uri', process.env.LINKEDIN_REDIRECT_URI);
+    // Dynamic redirect URI based on environment
+    const linkedinRedirectUri = process.env.NODE_ENV === 'production'
+      ? 'https://vision-classroom-beryl.vercel.app/auth/linkedin/callback'
+      : process.env.LINKEDIN_REDIRECT_URI || 'http://localhost:3000/auth/linkedin/callback';
+    params.append('redirect_uri', linkedinRedirectUri);
     
     const tokenResponse = await axios.post('https://www.linkedin.com/oauth/v2/accessToken', params, {
       headers: {
