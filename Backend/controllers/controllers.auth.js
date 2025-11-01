@@ -59,22 +59,24 @@ async function sendOTP(req, res) {
     // Save new OTP
     await OtpModel.create({ email, otp });
     
-    // Send OTP via email
+    // Send OTP via email using same service as notifications
+    const { sendNotificationEmail } = require('../services/emailService');
+    
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333;">Classroom Mitra - OTP Verification</h2>
+        <h2 style="color: #333;">Classroom Mitra - Account Verification</h2>
         <p>Hello ${name || 'User'},</p>
-        <p>Your OTP for registration is:</p>
+        <p>Your verification code for registration is:</p>
         <div style="background: #f4f4f4; padding: 20px; text-align: center; margin: 20px 0;">
           <h1 style="color: #007bff; font-size: 32px; margin: 0;">${otp}</h1>
         </div>
-        <p>This OTP will expire in 10 minutes.</p>
+        <p>This code will expire in 10 minutes.</p>
         <p>If you didn't request this, please ignore this email.</p>
       </div>
     `;
     
     // Try sending email first
-    const emailSent = await sendEmail(email, 'Classroom Mitra - OTP Verification', emailHtml);
+    const emailSent = await sendEmail(email, 'Classroom Mitra - Account Verification', emailHtml);
     
     if (emailSent) {
       console.log(`✅ Email sent successfully to ${email}`);
