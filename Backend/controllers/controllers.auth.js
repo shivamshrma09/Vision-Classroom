@@ -243,7 +243,10 @@ async function googleAuth(req, res) {
     return res.status(200).json({ token: authToken, user, message: "Google login successful" });
     
   } catch (error) {
-    console.error('Google auth error:', error);
+    console.error('Google auth error:', error.response?.data || error.message);
+    if (error.response?.data?.error === 'invalid_grant') {
+      return res.status(400).json({ message: "Authorization code expired. Please try again." });
+    }
     return res.status(500).json({ message: "Google authentication failed" });
   }
 }
