@@ -23,7 +23,7 @@ console.log('GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'SET' : 'NOT SET');
 connectToDb();
 
 const corsOptions = {
-   origin: ['https://visionclassro0m.vercel.app', 'https://visionclassr0om.vercel.app', 'https://vision-classroom2.onrender.com' , 'http://localhost:3000'],
+   origin: ['https://visionclassro0m.vercel.app', 'https://visionclassr0om.vercel.app', 'https://vision-classroom2.onrender.com' , 'http://localhost:3000', 'https://visionclassroo0m-jkiw.vercel.app'],
    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
    allowedHeaders: ['Content-Type', 'Authorization', 'token'],
    credentials: true,
