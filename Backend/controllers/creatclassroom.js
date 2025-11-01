@@ -65,6 +65,7 @@ const generateStudentId = () => {
 
 
 async function joinclassroom(req, res) {
+  console.log('Join classroom request:', req.body);
   const { CRcode, adminId  , userollnumber} = req.body;
 
   if (!CRcode || !adminId || !userollnumber) {
