@@ -126,10 +126,10 @@ function Singup() {
           localStorage.setItem('user', JSON.stringify(userData));
           
           alert('Signup successful!');
-          navigate('/classroom');
+          window.location.href = '/classroom';
         } else {
           alert('Registration completed! Please login.');
-          navigate('/login');
+          window.location.href = '/login';
         }
       } else {
         alert('Invalid OTP! Please try again.');
@@ -161,7 +161,7 @@ function Singup() {
   // Google OAuth signup
   const handleGoogleSignup = () => {
     const googleClientId = '1022210714474-b04nmoo09di6cugjuj4a6it3hnp800g7.apps.googleusercontent.com';
-    const redirectUri = encodeURIComponent('http://localhost:3000/auth/google/callback');
+    const redirectUri = encodeURIComponent(window.location.origin + '/auth/google/callback');
     const scope = encodeURIComponent('openid email profile');
     
     const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
