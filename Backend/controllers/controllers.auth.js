@@ -199,7 +199,11 @@ async function googleAuth(req, res) {
     params.append('client_secret', process.env.GOOGLE_CLIENT_SECRET);
     params.append('code', code);
     params.append('grant_type', 'authorization_code');
-    params.append('redirect_uri', process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback');
+    // Dynamic redirect URI based on environment
+    const redirectUri = process.env.NODE_ENV === 'production' 
+      ? 'https://vision-classroom-beryl.vercel.app/auth/google/callback'
+      : process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
+    params.append('redirect_uri', redirectUri);
     
     const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', params, {
       headers: {
@@ -250,7 +254,11 @@ async function linkedinAuth(req, res) {
     params.append('code', code);
     params.append('client_id', process.env.LINKEDIN_CLIENT_ID);
     params.append('client_secret', process.env.LINKEDIN_CLIENT_SECRET);
-    params.append('redirect_uri', process.env.LINKEDIN_REDIRECT_URI);
+    // Dynamic redirect URI based on environment
+    const linkedinRedirectUri = process.env.NODE_ENV === 'production'
+      ? 'https://vision-classroom-beryl.vercel.app/auth/linkedin/callback'
+      : process.env.LINKEDIN_REDIRECT_URI || 'http://localhost:3000/auth/linkedin/callback';
+    params.append('redirect_uri', linkedinRedirectUri);
     
     const tokenResponse = await axios.post('https://www.linkedin.com/oauth/v2/accessToken', params, {
       headers: {
