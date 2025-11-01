@@ -24,6 +24,7 @@ import "./index.css";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Singup from "./components/Singup";
+import OAuthCallback from "./components/OAuthCallback";
 
 import MainFile from "./components/MainFile";
 import Classroomenter from "./components/Classroomenter";
@@ -54,6 +55,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/Singup" element={<Singup />} />
+        <Route path="/auth/google/callback" element={<OAuthCallback />} />
+        <Route path="/auth/linkedin/callback" element={<OAuthCallback />} />
 
 
         <Route path="/classroom"     element={

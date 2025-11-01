@@ -11,6 +11,7 @@ import Feedback from "./Feedback";
 import TestInterface from "./TestInterface";
 import Grid from "./Grid";
 import Test from "./Test";
+import StudyMaterials from "./StudyMaterials";
 
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_BACKEND_URL || "http://localhost:4000",
@@ -35,6 +36,8 @@ function MainFile() {
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(null);
   const [students, setStudents] = useState([]);
   const [studentsrollnumbers, setStudentsrollnumbers] = useState([]);
+  const [showStudyMaterials, setShowStudyMaterials] = useState(false);
+  const [studyMaterialsClassroom, setStudyMaterialsClassroom] = useState(null);
 
   const handleCreatePost = async (postData) => {
     try {
@@ -86,7 +89,19 @@ function MainFile() {
 
 
   const handleCreateFeedback = async (newFeedback) => {
-
+    try {
+      const response = await axiosInstance.post('/fetures/submit-feedback', {
+        ...newFeedback,
+        CRcode: classData?.CRcode
+      });
+      
+      if (response.status === 201) {
+        alert('Feedback submitted successfully!');
+        setActiveMenu('dashboard'); // Hide feedback form and go back to dashboard
+      }
+    } catch (error) {
+      alert('Failed to submit feedback. Please try again.');
+    }
   };
 
   const handleSaveAttendance = async () => {
@@ -268,17 +283,38 @@ function MainFile() {
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       <Sidebar
-        onSelectMenu={(menu) => setActiveMenu(menu)}
+        onSelectMenu={(menu) => {
+          setActiveMenu(menu);
+          setShowStudyMaterials(false);
+        }}
         isTeacher={isTeacher}
         classData={classData}
         activeMenu={activeMenu}
+        onShowStudyMaterials={(classroom) => {
+          setStudyMaterialsClassroom(classroom);
+          setShowStudyMaterials(true);
+        }}
       />
 
-      {activeMenu === "feedback" ? (
+      {showStudyMaterials ? (
         <div
           style={{
             marginLeft: "270px",
-            marginTop: "60px",
+            marginTop: "64px",
+            flex: 1,
+            backgroundColor: "#f8f9fa",
+          }}
+        >
+          <StudyMaterials 
+            classData={studyMaterialsClassroom} 
+            isTeacher={isTeacher}
+          />
+        </div>
+      ) : activeMenu === "feedback" ? (
+        <div
+          style={{
+            marginLeft: "270px",
+            marginTop: "64px",
             flex: 1,
             display: "flex",
             justifyContent: "center",
@@ -299,6 +335,14 @@ function MainFile() {
             >
               Submit Feedback
             </h3>
+            <p style={{
+              textAlign: "center",
+              color: "#6b7280",
+              marginBottom: "30px",
+              fontSize: "16px"
+            }}>
+              Share your thoughts and suggestions
+            </p>
             <Feedback onCreate={handleCreateFeedback} classData={classData} />
           </div>
         </div>
@@ -306,7 +350,7 @@ function MainFile() {
         <div
           style={{
             marginLeft: "270px",
-            marginTop: "60px",
+            marginTop: "64px",
             flex: 1,
             padding: "20px",
             backgroundColor: "#f8f9fa",
@@ -319,7 +363,7 @@ function MainFile() {
         <div
           style={{
             marginLeft: "270px",
-            marginTop: "60px",
+            marginTop: "64px",
             flex: 1,
             display: "flex",
             backgroundColor: "#f8f9fa",
@@ -515,6 +559,15 @@ function MainFile() {
               </div>
             )}
 
+            {activeMenu === "studyMaterials" && (
+              <div style={{ padding: '0' }}>
+                <StudyMaterials 
+                  classData={classData} 
+                  isTeacher={isTeacher}
+                />
+              </div>
+            )}
+
 
           </div>
 
@@ -554,6 +607,24 @@ function MainFile() {
                     Create Test
                   </h3>
                   <Test onCreate={handleCreateTest} classData={classData} />
+                </div>
+              )}
+
+              {activeMenu === "studyMaterials" && (
+                <div>
+                  <h3 style={{ marginBottom: "20px", color: "#374151" }}>
+                    Study Materials Info
+                  </h3>
+                  <div style={{
+                    padding: '20px',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '8px',
+                    border: '1px solid #e5e7eb'
+                  }}>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '14px' }}>
+                      Upload and manage study materials for your classroom. Students can download and access all uploaded materials.
+                    </p>
+                  </div>
                 </div>
               )}
 

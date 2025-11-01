@@ -235,11 +235,84 @@ async function getclassroomdataenter(req, res) {
 
 
 
+async function getclassrooms(req, res) {
+  try {
+    const token = req.headers.authorization?.split(' ')[1] || req.headers.token;
+    
+    if (!token) {
+      return res.status(401).json({ message: "Token required" });
+    }
+    
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userid = decoded._id;
+    
+    const user = await userModel.findById(userid);
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    const allClassroomIds = user.classroomcodes || [];
+    
+    const allClassrooms = await CreatedclassroomModel.find({
+      _id: { $in: allClassroomIds }
+    });
+    
+    return res.status(200).json({
+      classrooms: allClassrooms
+    });
+    
+  } catch (error) {
+    console.error('Get classrooms error:', error);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
+async function leaveclassroom(req, res) {
+  try {
+    const { classroomId, userId } = req.body;
+    
+    if (!classroomId || !userId) {
+      return res.status(400).json({ message: "Classroom ID and User ID required" });
+    }
+    
+    // Remove user from classroom students array
+    const classroom = await CreatedclassroomModel.findByIdAndUpdate(
+      classroomId,
+      { $pull: { students: { userId: userId } } },
+      { new: true }
+    );
+    
+    if (!classroom) {
+      return res.status(404).json({ message: "Classroom not found" });
+    }
+    
+    // Remove classroom from user's classroomcodes array
+    await userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { classroomcodes: classroomId } },
+      { new: true }
+    );
+    
+    return res.status(200).json({
+      success: true,
+      message: "Left classroom successfully"
+    });
+    
+  } catch (error) {
+    console.error('Leave classroom error:', error);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+
 module.exports={
     creatclassroom,
     joinclassroom,
     getclassroomdata,
-    getclassroomdataenter
+    getclassroomdataenter,
+    getclassrooms,
+    leaveclassroom
 }
 
 

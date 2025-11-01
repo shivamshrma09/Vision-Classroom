@@ -430,7 +430,14 @@ const CreatedclassroomSchema = new mongoose.Schema({
     materials: [material],
     classerecodings:[classerecoding],
     feedbacks: [feedback],
-    attendences:[attendence]
+    attendences:[attendence],
+    notifications: [{
+        message: String,
+        type: String,
+        teacherName: String,
+        timestamp: { type: Date, default: Date.now },
+        _id: String
+    }]
 
 }, { timestamps: true });
 

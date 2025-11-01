@@ -7,6 +7,8 @@ function Grid({ students = [], onSaveAttendance, classData }) {
   const [selectedDate, setSelectedDate] = useState('');
   const [attendanceData, setAttendanceData] = useState({});
   const [savedStudents, setSavedStudents] = useState([]);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [password, setPassword] = useState('');
 
   const loadAttendance = async (date) => {
     if (!date || !classData?.CRcode) return;
@@ -54,11 +56,19 @@ function Grid({ students = [], onSaveAttendance, classData }) {
     }
   };
 
-  const saveAttendance = async () => {
+  const handleSaveClick = () => {
     if (!selectedDate) {
       alert('Please select a date');
       return;
     }
+    setShowPasswordModal(true);
+  };
+
+  const saveAttendance = async () => {
+    console.log('🚀 Frontend: saveAttendance called');
+    console.log('Selected date:', selectedDate);
+    console.log('Password:', password);
+    console.log('ClassData:', classData);
     
     let attendanceList;
     if (savedStudents.length === 0) {
@@ -84,28 +94,40 @@ function Grid({ students = [], onSaveAttendance, classData }) {
       });
     }
     
-
+    const requestData = {
+      date: selectedDate,
+      attendanceData: attendanceList,
+      CRcode: classData?.CRcode || 'unknown',
+      password: password
+    };
+    
+    console.log('📤 Sending request:', requestData);
     
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/save-attendance`, {
+      const url = `${process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000'}/fetures/save-attendance`;
+      console.log('📍 Request URL:', url);
+      
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          date: selectedDate,
-          attendanceData: attendanceList,
-          CRcode: classData?.CRcode || 'unknown'
-        })
+        body: JSON.stringify(requestData)
       });
       
+      console.log('📥 Response status:', response.status);
+      
       const result = await response.json();
+      console.log('📥 Response data:', result);
       
       if (response.ok) {
         alert('Attendance saved successfully!');
+        setShowPasswordModal(false);
+        setPassword('');
         loadAttendance(selectedDate);
       } else {
         alert(result.msg || 'Failed to save attendance');
       }
     } catch (error) {
+      console.error('❌ Frontend error:', error);
       alert('Network error. Please try again.');
     }
   };
@@ -116,9 +138,18 @@ function Grid({ students = [], onSaveAttendance, classData }) {
     }
   }, [selectedDate]);
 
-  const getSelectStyle = (status) => ({
-    backgroundColor: status === 'present' ? '#dcfce7' : status === 'late' ? '#fef3c7' : '#fecaca',
-    color: status === 'present' ? '#166534' : status === 'late' ? '#92400e' : '#991b1b'
+  const getTickBoxStyle = (status, hasData) => ({
+    width: '30px',
+    height: '30px',
+    border: '1px solid #9ca3af',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    fontSize: '16px',
+    backgroundColor: !hasData ? '#ffffff' : status === 'present' ? '#22c55e' : '#ef4444',
+    color: !hasData ? '#9ca3af' : '#ffffff'
   });
 
   return (
@@ -149,7 +180,8 @@ function Grid({ students = [], onSaveAttendance, classData }) {
             {studentNames.length > 0 ? (
               studentNames.map((name, index) => {
                 const studentId = students[index]?.userId || `student-${index}`;
-                const currentStatus = attendanceData[studentId] || 'absent';
+                const hasAttendanceData = attendanceData.hasOwnProperty(studentId);
+                const currentStatus = attendanceData[studentId];
                 
                 return (
                   <tr key={`${studentId}-${index}`}>
@@ -159,17 +191,21 @@ function Grid({ students = [], onSaveAttendance, classData }) {
                     <td className="h-12 w-40 bg-white border border-gray-500 text-center">
                       {name}
                     </td>
-                    <td className="h-12 w-40 border border-gray-500 text-center p-0">
-                      <select 
-                        className="w-full h-full border-none focus:outline-none cursor-pointer text-center font-medium"
-                        value={currentStatus}
-                        onChange={(e) => handleStatusChange(studentId, e.target.value)}
-                        style={getSelectStyle(currentStatus)}
-                      >
-                        <option value="present">Present</option>
-                        <option value="absent">Absent</option>
-                        <option value="late">Late</option>
-                      </select>
+                    <td className="h-12 w-40 border border-gray-500 text-center p-2">
+                      <div className="flex justify-center">
+                        <div 
+                          style={getTickBoxStyle(currentStatus, hasAttendanceData)}
+                          onClick={() => {
+                            if (!hasAttendanceData || currentStatus !== 'present') {
+                              handleStatusChange(studentId, 'present');
+                            } else {
+                              handleStatusChange(studentId, 'absent');
+                            }
+                          }}
+                        >
+                          {hasAttendanceData && currentStatus === 'present' ? '✓' : hasAttendanceData && currentStatus === 'absent' ? '✗' : ''}
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -187,12 +223,47 @@ function Grid({ students = [], onSaveAttendance, classData }) {
 
       <div className="flex justify-center mt-8">
         <button 
-          onClick={saveAttendance}
+          onClick={handleSaveClick}
           className="bg-[#356AC3] text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors"
         >
           Save Attendance
         </button>
       </div>
+
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <h3 className="text-lg font-semibold mb-4 text-center">Verify Password</h3>
+            <p className="text-gray-600 mb-4 text-center">Enter your password to save attendance</p>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#356AC3] mb-4"
+              onKeyPress={(e) => e.key === 'Enter' && saveAttendance()}
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setPassword('');
+                }}
+                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveAttendance}
+                className="flex-1 px-4 py-2 bg-[#356AC3] text-white rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

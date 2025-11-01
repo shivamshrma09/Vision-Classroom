@@ -20,12 +20,30 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: function() {
+      return !this.authProvider; // Password not required for OAuth users
+    },
     select: false,
   },
   strem: {
-    required: true,
+    required: function() {
+      return !this.authProvider; // Stream not required for OAuth users
+    },
     type: String,
+  },
+  authProvider: {
+    type: String,
+    enum: ['google', 'linkedin', null],
+    default: null
+  },
+  profilePicture: {
+    type: String,
+    default: null
+  },
+  profilePhoto: {
+    data: String,
+    contentType: String,
+    originalName: String
   },
  
 
@@ -33,6 +51,17 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: [],    
   },
+  notificationSettings: {
+    emailNotifications: { type: Boolean, default: true },
+    comments: { type: Boolean, default: true },
+    mentions: { type: Boolean, default: true },
+    privateComments: { type: Boolean, default: true },
+    classEnrollments: { type: Boolean, default: true },
+    workAndPosts: { type: Boolean, default: true },
+    returnedWork: { type: Boolean, default: true },
+    invitations: { type: Boolean, default: true },
+    dueDateReminders: { type: Boolean, default: true }
+  }
 
   });
 

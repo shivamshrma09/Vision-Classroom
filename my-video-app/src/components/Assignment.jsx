@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Bold, Italic, Underline, Link, Calendar, Users, ChevronDown, Paperclip, MessageCircle, ThumbsUp, Share, FileText, Send, Upload, Image } from 'lucide-react'
+import { Bold, Italic, Underline, Link, Calendar, Users, ChevronDown, Paperclip, MessageCircle, ThumbsUp, Share, FileText, Send, Upload, Image, Sparkles, Download } from 'lucide-react'
 
 function AssignmentDisplay({ assignment, onViewSubmissions, showSubmissions, setShowSubmissions, submissions, onSubmit, isTeacher, classData, onCommentAdded }) {
 
@@ -471,6 +471,8 @@ function Assignment({ assignments = [] }) {
   const [createdAssignments, setCreatedAssignments] = useState(assignments)
   const [selectedFile, setSelectedFile] = useState(null)
   const [contentType, setContentType] = useState('assignment')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedAssignment, setGeneratedAssignment] = useState(null)
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0]
@@ -486,6 +488,62 @@ function Assignment({ assignments = [] }) {
       reader.readAsDataURL(file)
     }
   }
+
+  const generateAssignmentWithAI = async () => {
+    const topic = prompt('Enter topic for assignment (e.g., "Photosynthesis"):');
+    if (!topic) return;
+    
+    const subject = prompt('Enter subject (e.g., "Biology"):') || 'General';
+    const className = prompt('Enter class (e.g., "Class 10"):') || 'Not specified';
+    const difficulty = prompt('Enter difficulty (easy/medium/hard):') || 'medium';
+    const assignmentType = prompt('Assignment type (homework/project/lab):') || 'homework';
+    
+    setIsGenerating(true);
+    try {
+      const response = await fetch('http://localhost:4000/gemini/generate-assignment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          topic,
+          subject,
+          class: className,
+          difficulty,
+          assignmentType,
+          dueDate: dueDate || '',
+          instructions: ''
+        })
+      });
+      
+      const assignmentData = await response.json();
+      
+      // Auto-fill form fields
+      setAssignmentTitle(`${topic} - ${assignmentType.charAt(0).toUpperCase() + assignmentType.slice(1)}`);
+      setAssignmentDescription(assignmentData.assignmentContent);
+      setGeneratedAssignment(assignmentData);
+      
+      alert('Assignment generated successfully! Review and post.');
+    } catch (error) {
+      console.error('AI assignment generation error:', error);
+      alert('Failed to generate assignment. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
+  const downloadAssignment = () => {
+    if (!generatedAssignment) return;
+    
+    const content = `${assignmentTitle}\n\n${assignmentDescription}`;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${assignmentTitle.replace(/[^a-z0-9]/gi, '_')}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const handleAssignment = () => {
     if (!assignmentTitle.trim() || !assignmentDescription.trim()) return
@@ -564,13 +622,34 @@ function Assignment({ assignments = [] }) {
         </div>
 
         <div className="p-4">
-          <input
-            type="text"
-            value={assignmentTitle}
-            onChange={(e) => setAssignmentTitle(e.target.value)}
-            placeholder={contentType === 'assignment' ? 'Assignment title' : 'Study material title'}
-            className="w-full p-3 mb-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#356AC3] focus:border-transparent text-gray-700"
-          />
+          <div className="flex gap-2 mb-3">
+            <input
+              type="text"
+              value={assignmentTitle}
+              onChange={(e) => setAssignmentTitle(e.target.value)}
+              placeholder={contentType === 'assignment' ? 'Assignment title' : 'Study material title'}
+              className="flex-1 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#356AC3] focus:border-transparent text-gray-700"
+            />
+            {contentType === 'assignment' && (
+              <button
+                onClick={generateAssignmentWithAI}
+                disabled={isGenerating}
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-sm">Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    <span className="text-sm">🤖 Generate</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
           <textarea
             value={assignmentDescription}
             onChange={(e) => setAssignmentDescription(e.target.value)}
@@ -600,6 +679,15 @@ function Assignment({ assignments = [] }) {
             <span className="text-sm text-gray-500">Shivam Kumar</span>
           </div>
           <div className="flex items-center space-x-3">
+            {generatedAssignment && (
+              <button
+                onClick={downloadAssignment}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download</span>
+              </button>
+            )}
             <button className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
               Cancel
             </button>

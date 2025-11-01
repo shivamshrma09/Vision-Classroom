@@ -1,5 +1,5 @@
 {
-  "name": "vision-classroom",
+  "name": "classroom-mitra",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,6 +9,7 @@
     "@coreui/react": "^5.9.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@google/generative-ai": "^0.24.1",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
     "@mui/x-date-pickers": "^8.12.0",
@@ -23,6 +24,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-google-button": "^0.8.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.9.3",
     "react-scripts": "5.0.1",
     "social-login-buttons": "^0.0.4",

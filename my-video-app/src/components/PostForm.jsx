@@ -1,5 +1,11 @@
 import React, { useState } from 'react'
 import { Bold, Italic, Underline, Link, Calendar, Users, ChevronDown, Paperclip } from 'lucide-react'
+import { SiGooglegemini } from 'react-icons/si'
+import axios from 'axios'
+
+const axiosInstance = axios.create({
+  baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000',
+});
 
 function PostForm({ onCreate, classData }) {
   const [postTitle, setPostTitle] = useState('')
@@ -10,6 +16,7 @@ function PostForm({ onCreate, classData }) {
   const [audience, setAudience] = useState('All students')
   const [showAudience, setShowAudience] = useState(false)
   const [selectedFile, setSelectedFile] = useState(null)
+  const [enhancing, setEnhancing] = useState(false)
 
   const handlePost = () => {
     if (!postTitle.trim() || !postContent.trim()) {
@@ -52,6 +59,26 @@ function PostForm({ onCreate, classData }) {
     setScheduleTime('')
     setSelectedFile(null)
   }
+
+  const handleEnhanceContent = async () => {
+    if (!postContent.trim()) {
+      alert('Please write some content first');
+      return;
+    }
+
+    setEnhancing(true);
+    try {
+      const response = await axiosInstance.post('/gemini/enhance', {
+        text: postContent,
+        type: 'post description'
+      });
+      setPostContent(response.data.enhancedText);
+    } catch (error) {
+      alert('Failed to enhance content. Please try again.');
+    } finally {
+      setEnhancing(false);
+    }
+  };
 
   return (
     <div className="w-full h-full overflow-y-auto">
@@ -124,6 +151,24 @@ function PostForm({ onCreate, classData }) {
                 <Link className="w-3 h-3 text-gray-600" />
               </button>
             </div>
+            
+            <button
+              onClick={handleEnhanceContent}
+              disabled={enhancing || !postContent.trim()}
+              className="absolute bottom-3 right-3 flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xs rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {enhancing ? (
+                <>
+                  <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Enhancing...</span>
+                </>
+              ) : (
+                <>
+                  <SiGooglegemini className="w-3 h-3" />
+                  <span>Enhance with AI</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
 

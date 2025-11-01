@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, Trash2, Users, ChevronDown } from 'lucide-react'
+import { Plus, Trash2, Users, ChevronDown, Sparkles } from 'lucide-react'
 
 
 
@@ -19,6 +19,17 @@ function Test({ onCreate, classData }) {
     correctAnswer: [],
     scale: null
   }])
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [showFileUpload, setShowFileUpload] = useState(false)
+  const [uploadFile, setUploadFile] = useState(null)
+  const [fileGenerating, setFileGenerating] = useState(false)
+  const [formData, setFormData] = useState({
+    subject: '',
+    class: '',
+    chapter: '',
+    difficulty: 'medium',
+    numberOfQuestions: 5
+  })
 
   const addQuestion = () => {
     setQuestions([...questions, {
@@ -66,6 +77,102 @@ function Test({ onCreate, classData }) {
       setQuestions(updatedQuestions)
     }
   }
+
+  const generateTestFromFile = async () => {
+    if (!uploadFile) {
+      alert('Please select a PDF or image file first');
+      return;
+    }
+    
+    setFileGenerating(true);
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('file', uploadFile);
+      formDataToSend.append('testTitle', testTitle);
+      formDataToSend.append('testDescription', testDescription);
+      formDataToSend.append('subject', formData.subject);
+      formDataToSend.append('class', formData.class);
+      formDataToSend.append('chapter', formData.chapter);
+      formDataToSend.append('difficulty', formData.difficulty);
+      formDataToSend.append('numberOfQuestions', formData.numberOfQuestions);
+      
+      const response = await fetch('http://localhost:4000/gemini/generate-test-from-file', {
+        method: 'POST',
+        body: formDataToSend
+      });
+      
+      const testData = await response.json();
+      
+      // Auto-fill form fields
+      setTestTitle(testData.testTitle);
+      setTestDescription(testData.testDescription + '\n\nExtracted Content: ' + testData.extractedContent);
+      
+      // Convert AI questions to component format
+      const aiQuestions = testData.questions.map(q => ({
+        questiontitle: q.question,
+        type: 'single_choice',
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        scale: null
+      }));
+      
+      setQuestions(aiQuestions);
+      setShowFileUpload(false);
+      alert('Test generated successfully from file! Review and create.');
+    } catch (error) {
+      console.error('File AI generation error:', error);
+      alert('Failed to generate test from file. Please try again.');
+    } finally {
+      setFileGenerating(false);
+    }
+  };
+
+  const generateTestWithAI = async () => {
+    const syllabus = prompt('Enter syllabus (e.g., Class 10 Mathematics):');
+    if (!syllabus) return;
+    
+    const topic = prompt('Enter topic (e.g., Quadratic Equations):');
+    if (!topic) return;
+    
+    const numQuestions = prompt('Number of questions (default: 5):') || '5';
+    
+    setIsGenerating(true);
+    try {
+      const response = await fetch('http://localhost:4000/gemini/generate-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          syllabus, 
+          topic, 
+          numberOfQuestions: parseInt(numQuestions),
+          difficulty: 'medium'
+        })
+      });
+      
+      const testData = await response.json();
+      
+      // Auto-fill form fields
+      setTestTitle(testData.testTitle);
+      setTestDescription(testData.testDescription);
+      
+      // Convert AI questions to component format
+      const aiQuestions = testData.questions.map(q => ({
+        questiontitle: q.question,
+        type: 'single_choice',
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        scale: null
+      }));
+      
+      setQuestions(aiQuestions);
+      alert('Test generated successfully! Review and create.');
+    } catch (error) {
+      console.error('AI generation error:', error);
+      alert('Failed to generate test. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleCreateTest = () => {
     if (!testTitle.trim() || !testDescription.trim()) {
@@ -201,7 +308,119 @@ function Test({ onCreate, classData }) {
           />
           
           <div className="space-y-4">
-            <h3 className="font-medium text-gray-900">Questions</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-gray-900">Questions</h3>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowFileUpload(!showFileUpload)}
+                  className="flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg hover:from-green-600 hover:to-teal-600 transition-all"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-sm">📄 Upload & Generate</span>
+                </button>
+
+              </div>
+            </div>
+            
+            {showFileUpload && (
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                <h4 className="font-medium text-gray-800 mb-3">Generate Test from PDF/Image</h4>
+                
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Subject</label>
+                    <input
+                      type="text"
+                      value={formData.subject}
+                      onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                      placeholder="e.g., Mathematics"
+                      className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#356AC3]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Class</label>
+                    <input
+                      type="text"
+                      value={formData.class}
+                      onChange={(e) => setFormData({...formData, class: e.target.value})}
+                      placeholder="e.g., Class 10"
+                      className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#356AC3]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Chapter/Topic</label>
+                    <input
+                      type="text"
+                      value={formData.chapter}
+                      onChange={(e) => setFormData({...formData, chapter: e.target.value})}
+                      placeholder="e.g., Quadratic Equations"
+                      className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#356AC3]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Difficulty</label>
+                    <select
+                      value={formData.difficulty}
+                      onChange={(e) => setFormData({...formData, difficulty: e.target.value})}
+                      className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#356AC3]"
+                    >
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Number of Questions</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={formData.numberOfQuestions}
+                    onChange={(e) => setFormData({...formData, numberOfQuestions: parseInt(e.target.value)})}
+                    className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#356AC3]"
+                  />
+                </div>
+                
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Upload PDF or Image</label>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => setUploadFile(e.target.files[0])}
+                    className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#356AC3]"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Supported: PDF, JPG, PNG (Max 10MB)</p>
+                </div>
+                
+                <div className="flex gap-2">
+                  <button
+                    onClick={generateTestFromFile}
+                    disabled={fileGenerating || !uploadFile}
+                    className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {fileGenerating ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-sm">Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        <span className="text-sm">Generate from File</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setShowFileUpload(false)}
+                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
             {questions.map((question, qIndex) => (
               <div key={qIndex} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">

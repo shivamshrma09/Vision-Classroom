@@ -1,19 +1,19 @@
 {
-  "short_name": "Vision Classroom",
-  "name": "Vision Classroom - Smart Learning Management System",
+  "short_name": "Classroom Mitra",
+  "name": "Classroom Mitra - Smart Learning Management System",
   "icons": [
     {
-      "src": "LOGO.png",
+      "src": "CM.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/png"
     },
     {
-      "src": "LOGO.png",
+      "src": "CM.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "LOGO.png",
+      "src": "CM.png",
       "type": "image/png",
       "sizes": "512x512"
     }

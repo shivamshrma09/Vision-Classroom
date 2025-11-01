@@ -1,5 +1,59 @@
 const CreatedclassroomModel = require("../models/createdclassroomModel");
 const userModel = require("../models/UserModel");
+const nodemailer = require('nodemailer');
+
+// Create transporter function (same as OTP)
+function createTransporter() {
+  return nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+}
+
+// Send email function (same as OTP)
+async function sendEmail(to, subject, html) {
+  try {
+    const transporter = createTransporter();
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to,
+      subject,
+      html
+    });
+    return true;
+  } catch (error) {
+    console.error('Email send error:', error);
+    return false;
+  }
+}
+
+// Send notification to students (same pattern as OTP)
+const sendStudentNotification = async (email, teacherName, action, title, className) => {
+  const emailHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #333;">Classroom Mitra - ${className}</h2>
+      <p>Hello,</p>
+      <p><strong>${teacherName}</strong> ${action}: <strong>"${title}"</strong></p>
+      <div style="background: #f4f4f4; padding: 20px; text-align: center; margin: 20px 0;">
+        <h3 style="color: #007bff; margin: 0;">New Activity</h3>
+        <p style="color: #333; margin: 10px 0;">Check your classroom for updates</p>
+      </div>
+      <p>Visit your classroom to see the latest activities.</p>
+      <p>If you're not enrolled in this class, please ignore this email.</p>
+    </div>
+  `;
+
+  const emailSent = await sendEmail(email, `Classroom Mitra - New Activity in ${className}`, emailHtml);
+  
+  if (emailSent) {
+    console.log(`✅ Notification sent successfully to ${email}`);
+  } else {
+    console.log(`🔑 EMAIL FAILED - Notification for ${email}`);
+  }
+};
 
 
 
@@ -37,7 +91,45 @@ async function post(req, res) {
     };
 
     classroom.posts.push(newPost);
+    
+    // Send notification
+    const teacher = await userModel.findById(classroom.adminId);
+    const notification = {
+      message: `posted a new announcement: "${title}"`,
+      type: 'post',
+      teacherName: teacher ? teacher.name : 'Teacher',
+      timestamp: new Date(),
+      _id: new Date().getTime().toString()
+    };
+    
+    if (!classroom.notifications) {
+      classroom.notifications = [];
+    }
+    classroom.notifications.push(notification);
+    
     await classroom.save();
+    
+    // Send email notifications to students
+    console.log('🔍 Classroom students:', classroom.students);
+    console.log('🔍 Student IDs to find:', classroom.students.map(s => s.userId));
+    
+    const students = await userModel.find({ 
+      _id: { $in: classroom.students.map(s => s.userId) }
+    });
+    
+    console.log('📧 Found students for email:', students.length);
+    console.log('📧 Student emails:', students.map(s => s.email));
+    
+    for (const student of students) {
+      console.log(`📤 Sending email to: ${student.email}`);
+      await sendStudentNotification(
+        student.email,
+        teacher.name,
+        'posted a new announcement',
+        title,
+        classroom.CRName
+      );
+    }
 
     return res.status(201).json({ msg: "Post created and added to classroom successfully" });
 
@@ -125,8 +217,46 @@ async function assignment(req, res) {
       scheduleTime,
     };
 
-    classroom.aassignmets.push(assignment); 
+    classroom.aassignmets.push(assignment);
+    
+    // Send notification
+    const teacher = await userModel.findById(classroom.adminId);
+    const notification = {
+      message: `assigned new work: "${title}"`,
+      type: 'assignment',
+      teacherName: teacher ? teacher.name : 'Teacher',
+      timestamp: new Date(),
+      _id: new Date().getTime().toString()
+    };
+    
+    if (!classroom.notifications) {
+      classroom.notifications = [];
+    }
+    classroom.notifications.push(notification);
+    
     await classroom.save();
+    
+    // Send email notifications to students
+    console.log('🔍 Assignment - Classroom students:', classroom.students);
+    console.log('🔍 Assignment - Student IDs to find:', classroom.students.map(s => s.userId));
+    
+    const students = await userModel.find({ 
+      _id: { $in: classroom.students.map(s => s.userId) }
+    });
+    
+    console.log('📧 Assignment - Found students for email:', students.length);
+    console.log('📧 Assignment - Student emails:', students.map(s => s.email));
+    
+    for (const student of students) {
+      console.log(`📤 Assignment - Sending email to: ${student.email}`);
+      await sendStudentNotification(
+        student.email,
+        teacher.name,
+        'assigned new work',
+        title,
+        classroom.CRName
+      );
+    }
 
     return res.status(201).json({ msg: "Assignment posted and added to classroom successfully" });
 
@@ -147,46 +277,60 @@ async function testgenerater(req, res) {
       return res.status(404).json({ msg: "Classroom not found" });
     }
 
-    const formattedQuestions = questions.map((q, index) => {
-      if (!q.type || !['multiple_choice', 'checkboxes', 'dropdown', 'file_upload', 'linear_scale', 'rating', 'date', 'time'].includes(q.type)) {
-        console.warn(`Invalid or missing question type for question at index ${index + 1}: ${q.questiontitle}`);
-        q.type = 'multiple_choice';
-      }
-
-      const question = {
-        questiontitle: q.questiontitle,
-        type: q.type,
-        options: q.options || [], 
-        answer: q.answer || null, 
-        scale: q.scale || null
-      };
-
-      if (q.type === 'file_upload' && q.file) {
-        question.file = {
-          data: q.file.data,
-          contentType: q.file.contentType,
-          originalName: q.file.originalName
-        };
-      }
-
-      return question;
-    });
-
     const newTest = {
       title,
       description,
-      questions: formattedQuestions,
+      questions,
       scheduleTime,
       expireTime
     };
 
     classroom.tests.push(newTest);
+    
+    // Send notification
+    const teacher = await userModel.findById(classroom.adminId);
+    const notification = {
+      message: `created a new test: "${title}"`,
+      type: 'test',
+      teacherName: teacher ? teacher.name : 'Teacher',
+      timestamp: new Date(),
+      _id: new Date().getTime().toString()
+    };
+    
+    if (!classroom.notifications) {
+      classroom.notifications = [];
+    }
+    classroom.notifications.push(notification);
+    
     await classroom.save();
+    
+    // Send email notifications to students
+    console.log('🔍 Test - Classroom students:', classroom.students);
+    console.log('🔍 Test - Student IDs to find:', classroom.students.map(s => s.userId));
+    
+    const students = await userModel.find({ 
+      _id: { $in: classroom.students.map(s => s.userId) }
+    });
+    
+    console.log('📧 Test - Found students for email:', students.length);
+    console.log('📧 Test - Student emails:', students.map(s => s.email));
+    
+    for (const student of students) {
+      console.log(`📤 Test - Sending email to: ${student.email}`);
+      await sendStudentNotification(
+        student.email,
+        teacher.name,
+        'created a new test',
+        title,
+        classroom.CRName
+      );
+    }
 
     return res.status(201).json({ msg: "Test created and added to classroom successfully" });
+
   } catch (error) {
-    console.error("Error creating test:", error);
-    return res.status(400).json({ msg: error.message });
+    console.error("Error saving test:", error);
+    return res.status(500).json({ msg: "Server error" });
   }
 }
 
@@ -536,6 +680,8 @@ async function updateFeedbackStatus(req, res) {
 
 
 async function saveAttendance(req, res) {
+  console.log('🚀 saveAttendance function called!');
+  
   const { date, attendanceData, CRcode } = req.body;
   
   try {
@@ -545,14 +691,22 @@ async function saveAttendance(req, res) {
       return res.status(404).json({ msg: "Classroom not found" });
     }
     
+    // Process attendance data to ensure proper status handling
+    const processedAttendanceData = attendanceData.map(student => ({
+      studentId: student.studentId,
+      studnetsrollnumber: student.studnetsrollnumber,
+      studentName: student.studentName,
+      status: student.status || 'absent' // Default to absent if no status provided
+    }));
+    
     const existingAttendance = classroom.attendences.find(a => a.date === date);
     
     if (existingAttendance) {
-      existingAttendance.attendencelist = attendanceData;
+      existingAttendance.attendencelist = processedAttendanceData;
     } else {
       const newAttendance = {
         date: date,
-        attendencelist: attendanceData
+        attendencelist: processedAttendanceData
       };
       classroom.attendences.push(newAttendance);
     }
