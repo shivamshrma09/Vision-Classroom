@@ -206,7 +206,7 @@ async function googleAuth(req, res) {
     params.append('grant_type', 'authorization_code');
     // Dynamic redirect URI based on environment
     const redirectUri = process.env.NODE_ENV === 'production' 
-      ? 'https://vision-classroom-beryl.vercel.app/auth/google/callback'
+      ? 'https://visionclassroom7-yczm.vercel.app/auth/google/callback'
       : process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback';
     params.append('redirect_uri', redirectUri);
     
@@ -264,7 +264,7 @@ async function linkedinAuth(req, res) {
     params.append('client_secret', process.env.LINKEDIN_CLIENT_SECRET);
     // Dynamic redirect URI based on environment
     const linkedinRedirectUri = process.env.NODE_ENV === 'production'
-      ? 'https://vision-classroom-beryl.vercel.app/auth/linkedin/callback'
+      ? 'https://visionclassroom7-yczm.vercel.app/auth/linkedin/callback'
       : process.env.LINKEDIN_REDIRECT_URI || 'http://localhost:3000/auth/linkedin/callback';
     params.append('redirect_uri', linkedinRedirectUri);
     
