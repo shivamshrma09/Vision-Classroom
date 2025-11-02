@@ -16,9 +16,9 @@ function createTransporter() {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS
     },
-    connectionTimeout: 60000,
-    greetingTimeout: 30000,
-    socketTimeout: 60000
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+    socketTimeout: 10000
   });
 }
 

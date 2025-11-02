@@ -178,6 +178,15 @@ const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000',
 });
 
+// Add token to all requests
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.token = token;
+  }
+  return config;
+});
+
 function Classroomenter() {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState(""); 

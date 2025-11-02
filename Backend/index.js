@@ -23,7 +23,15 @@ console.log('GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'SET' : 'NOT SET');
 connectToDb();
 
 const corsOptions = {
-   origin: ['https://visionclassro0m.vercel.app', 'https://visionclassr0om.vercel.app', 'https://vision-classroom2.onrender.com' , 'http://localhost:3000', 'https://visionclassroo0m-jkiw.vercel.app', 'https://vision-classroom-beryl.vercel.app'],
+   origin: [
+     'https://visionclassro0m.vercel.app', 
+     'https://visionclassr0om.vercel.app', 
+     'https://vision-classroom2.onrender.com', 
+     'http://localhost:3000', 
+     'https://visionclassroo0m-jkiw.vercel.app', 
+     'https://vision-classroom-beryl.vercel.app',
+     'https://visionclassroom7-yczm.vercel.app'
+   ],
    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
    allowedHeaders: ['Content-Type', 'Authorization', 'token'],
    credentials: true,
@@ -37,6 +45,12 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors(corsOptions));
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
 app.use('/users', userroutes);
 app.use('/classroom', creatclassroomroutes);
 app.use('/fetures', feturesroutes);
@@ -46,9 +60,15 @@ app.use('/api/todos', todoRoutes);
 app.use('/gemini', enhanceRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Classroom Mitra")
+  res.json({ message: "Classroom Mitra Backend API", status: "Running" });
+});
+
+// Handle 404 routes
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Route not found' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
