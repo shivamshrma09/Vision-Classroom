@@ -1,4 +1,106 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { trackEvent, trackPageView } from '../utils/analytics';
+
+// Add smooth scroll CSS
+const smoothScrollStyle = `
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+  
+  .fade-in-delay-1 {
+    animation-delay: 0.2s;
+  }
+  
+  .fade-in-delay-2 {
+    animation-delay: 0.4s;
+  }
+  
+  .fade-in-delay-3 {
+    animation-delay: 0.6s;
+  }
+  
+  .slide-in-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    animation: slideInLeft 0.8s ease-out forwards;
+  }
+  
+  .slide-in-right {
+    opacity: 0;
+    transform: translateX(50px);
+    animation: slideInRight 0.8s ease-out forwards;
+  }
+  
+  .bounce-in {
+    animation: bounceIn 1s ease-out;
+  }
+  
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInLeft {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideInRight {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes bounceIn {
+    0% {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    70% {
+      transform: scale(0.9);
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+`;
 
 const SeeInActionDemo = () => {
   const [activeOption, setActiveOption] = useState('posts');
@@ -6,43 +108,43 @@ const SeeInActionDemo = () => {
   const demoOptions = {
     posts: {
       title: "Smart Posts Management",
-      description: "Create and share engaging posts with multimedia content, schedule announcements, and manage classroom communications effectively. Share updates, resources, and important information with rich text formatting, file attachments, and scheduled posting capabilities.",
+      description: "Create and share engaging posts with multimedia content, schedule announcements, and manage classroom communications effectively. AI can write posts for you - just give topic and AI will create engaging content automatically.",
       image: "/demo-posts.png",
       icon: <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clipRule="evenodd" /></svg>,
-      features: ["Rich text editor with formatting", "File and media attachments", "Scheduled posting", "Student engagement tracking"]
+      features: ["AI-powered post writing", "Rich text editor with formatting", "File and media attachments", "Scheduled posting"]
     },
     assignments: {
       title: "Assignment Creation & Management",
-      description: "Design comprehensive assignments with multiple question types, file uploads, and automated grading. Set deadlines, track submissions, and provide detailed feedback to students with our intuitive assignment management system.",
+      description: "Teachers can give assignments to students and students can submit them online. No more paperwork! Complete digital assignment management system for modern classrooms.",
       image: "/demo-assignments.png",
       icon: <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fillRule="evenodd" d="M4 5a2 2 0 012-2v1a2 2 0 002 2h4a2 2 0 002-2V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z" clipRule="evenodd" /></svg>,
-      features: ["Multiple question types", "File upload support", "Automated grading", "Deadline management", "Plagiarism detection"]
+      features: ["Online assignment submission", "File upload support", "No paperwork needed", "Deadline management", "AI grading (Coming Soon)"]
     },
     attendance: {
       title: "Smart Attendance Tracking",
-      description: "Automatically track student attendance during live classes with intelligent monitoring. Generate detailed reports, view attendance patterns, and send notifications to parents about student participation.",
+      description: "Teachers can mark student attendance online from their phone or computer. Send short attendance emails to students with low attendance automatically.",
       image: "/demo-attendance.png",
       icon: <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/></svg>,
-      features: ["Real-time attendance marking", "Automated reports generation", "Parent notifications", "Attendance analytics", "Absence tracking"]
+      features: ["Online attendance marking", "Mobile-friendly interface", "Email alerts for low attendance", "Student participation tracking", "Date-wise attendance records"]
     },
     tests: {
       title: "Interactive Testing Platform",
-      description: "Create engaging tests with multiple choice, short answer, and essay questions. Real-time monitoring, anti-cheating measures, and instant results help maintain academic integrity while providing immediate feedback.",
+      description: "Create engaging tests with multiple choice, short answer, and essay questions. AI can make whole test on behalf of you - just give information about topic and difficulty level.",
       image: "/demo-tests.png",
       icon: <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>,
-      features: ["Multiple question formats", "Anti-cheating measures", "Instant results", "Time management", "Detailed analytics"]
+      features: ["AI-powered test generation", "Multiple question formats", "Anti-cheating measures", "Instant results", "Time management"]
     },
     materials: {
       title: "Study Material Storage",
-      description: "Organize and share study materials with cloud storage integration. Upload documents, videos, and resources with categorization and search functionality for easy access by students.",
+      description: "You can now organize your materials easily. We are giving you a feature to organize and manage all your study materials, documents, and resources in one place.",
       image: "/demo-materials.png",
       icon: <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2H8a2 2 0 01-2-2v-2z" clipRule="evenodd" /></svg>,
-      features: ["Cloud storage integration", "File categorization", "Advanced search", "Version control", "Access permissions"]
+      features: ["Easy material organization", "File categorization", "Advanced search", "Version control"]
     },
     todo: {
       title: "Task & Todo Management",
       description: "Keep track of assignments, deadlines, and important tasks with our integrated todo system. Students and teachers can manage their schedules and never miss important deadlines.",
-      image: "/demo-todo.png",
+      image: "/todod.png",
       icon: <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" /></svg>,
       features: ["Task prioritization", "Deadline reminders", "Progress tracking", "Calendar integration", "Team collaboration"]
     },
@@ -51,7 +153,8 @@ const SeeInActionDemo = () => {
       description: "Conduct interactive live classes with HD video, screen sharing, and real-time collaboration tools. Schedule classes, manage participants, and record sessions for later review.",
       image: "/demo-classes.png",
       icon: <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/></svg>,
-      features: ["HD video streaming", "Screen sharing", "Interactive whiteboard", "Session recording", "Participant management"]
+      features: ["HD video streaming", "Screen sharing", "Interactive whiteboard", "Session recording", "Participant management"],
+      comingSoon: true
     }
   };
   
@@ -81,9 +184,16 @@ const SeeInActionDemo = () => {
             <div className="w-12 h-12 bg-[#356AC3] rounded-lg flex items-center justify-center">
               {demoOptions[activeOption].icon}
             </div>
-            <h3 className="text-2xl font-bold text-gray-800">
-              {demoOptions[activeOption].title}
-            </h3>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800">
+                {demoOptions[activeOption].title}
+              </h3>
+              {demoOptions[activeOption].comingSoon && (
+                <p className="text-red-500 text-sm font-medium">
+                  Coming Soon
+                </p>
+              )}
+            </div>
           </div>
           
           <p className="text-gray-600 leading-relaxed mb-6">
@@ -98,7 +208,9 @@ const SeeInActionDemo = () => {
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-gray-700">{feature}</span>
+                <span className={`${feature.includes('Coming Soon') ? 'text-red-500' : 'text-gray-700'}`}>
+                  {feature}
+                </span>
               </div>
             ))}
           </div>
@@ -131,6 +243,20 @@ const SeeInActionDemo = () => {
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
+  // Add smooth scroll styles to document
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = smoothScrollStyle;
+    document.head.appendChild(styleElement);
+    
+    // Track page view
+    trackPageView('/home');
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+  
   const features = [
     {
       id: 1,
@@ -148,18 +274,19 @@ const Home = () => {
       id: 3,
       name: "Live Video Classes",
       description: "Conduct HD video classes with screen sharing, real-time chat, and automatic attendance tracking for students.",
-      image: "/video.png"
+      image: "/video.png",
+      comingSoon: true
     },
     {
       id: 4,
-      name: "Material Sharing",
-      description: "Upload and share study materials, documents, and resources. Schedule material releases for organized learning.",
+      name: "Material Storage",
+      description: "Store your study materials, documents, and resources securely. Teachers can organize and manage all educational content in one place.",
       image: "/materials.png"
     },
     {
       id: 5,
       name: "Attendance Tracking",
-      description: "Smart attendance marking during live classes. Generate detailed attendance reports and analytics for teachers.",
+      description: "Teachers can now mark attendance online from their phone or computer. Generate detailed attendance reports and analytics easily.",
       image: "/attendance.png"
     },
     {
@@ -184,7 +311,7 @@ const Home = () => {
       id: 9,
       name: "Chat & Communication",
       description: "Real-time messaging system with file sharing and group discussions for enhanced classroom collaboration.",
-      image: "/chat.png"
+      image: "/chatsjsj.png"
     }
   ];
 
@@ -231,29 +358,30 @@ const Home = () => {
       <div className="bg-white py-16">
         <div className="container mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">
-              The Future of <span className="text-[#356AC3]">Digital Learning</span>
+          <div className="slide-in-left">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4 fade-in">
+              Manage Your <span className="text-[#356AC3]">Classroom Digitally</span>
             </h1>
-            <p className="text-lg text-gray-600 mb-6">
-              Create interactive virtual classrooms, conduct live sessions, manage assignments, and connect with students seamlessly - all in one powerful platform.
+            <p className="text-lg text-gray-600 mb-4 fade-in fade-in-delay-1">
+              WhatsApp is not for education - Create interactive virtual classrooms, conduct live sessions, manage assignments, and connect with students seamlessly - all in one powerful platform.
             </p>
-            <a href="/singup" className="inline-block px-6 py-3 bg-[#356AC3] text-white text-base font-semibold rounded-lg hover:bg-blue-700 transition duration-200">
+
+            <a href="/singup" className="inline-block px-6 py-3 bg-[#356AC3] text-white text-base font-semibold rounded-lg hover:bg-blue-700 transition-all duration-300 hover:scale-105 fade-in fade-in-delay-2" onClick={() => trackEvent('click', 'CTA', 'Hero Start Teaching')}>
               Start Teaching Now
             </a>
           </div>
-          <div className="-ml-8 overflow-hidden relative">
+          <div className="-ml-8 overflow-hidden relative slide-in-right">
             {/* Decorative Shapes */}
-            <div className="absolute -top-4 -left-4 w-8 h-8 bg-[#356AC3] rounded-full opacity-80"></div>
-            <div className="absolute -top-2 -right-6 w-6 h-6 bg-[#356AC3] transform rotate-45 opacity-60"></div>
-            <div className="absolute -bottom-3 -left-6 w-0 h-0 border-l-[12px] border-r-[12px] border-b-[20px] border-l-transparent border-r-transparent border-b-[#356AC3] opacity-70"></div>
-            <div className="absolute -bottom-4 -right-4 w-10 h-10 bg-[#356AC3] opacity-50"></div>
-            <div className="absolute top-1/2 -left-8 w-4 h-4 bg-[#356AC3] rounded-full opacity-40"></div>
-            <div className="absolute top-1/4 -right-8 w-6 h-6 bg-[#356AC3] transform rotate-45 opacity-50"></div>
+            <div className="absolute -top-4 -left-4 w-8 h-8 bg-[#356AC3] rounded-full opacity-80 bounce-in float"></div>
+            <div className="absolute -top-2 -right-6 w-6 h-6 bg-[#356AC3] transform rotate-45 opacity-60 bounce-in float" style={{animationDelay: '0.2s'}}></div>
+            <div className="absolute -bottom-3 -left-6 w-0 h-0 border-l-[12px] border-r-[12px] border-b-[20px] border-l-transparent border-r-transparent border-b-[#356AC3] opacity-70 bounce-in float" style={{animationDelay: '0.4s'}}></div>
+            <div className="absolute -bottom-4 -right-4 w-10 h-10 bg-[#356AC3] opacity-50 bounce-in float" style={{animationDelay: '0.6s'}}></div>
+            <div className="absolute top-1/2 -left-8 w-4 h-4 bg-[#356AC3] rounded-full opacity-40 bounce-in float" style={{animationDelay: '0.8s'}}></div>
+            <div className="absolute top-1/4 -right-8 w-6 h-6 bg-[#356AC3] transform rotate-45 opacity-50 bounce-in float" style={{animationDelay: '1s'}}></div>
             
             {/* Image without border */}
-            <div className="rounded-lg overflow-hidden">
-              <img src="/banner.png" alt="Classroom" className="w-full h-auto scale-110"/>
+            <div className="rounded-lg overflow-hidden fade-in fade-in-delay-3">
+              <img src="/banner.png" alt="Classroom" className="w-full h-auto scale-110 hover:scale-115 transition-transform duration-500"/>
             </div>
           </div>
         </div>
@@ -263,8 +391,9 @@ const Home = () => {
 
       <div className="bg-white py-16">
         <div className="container mx-auto px-6">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-4">Our Features</h2>
-          <p className="text-center text-gray-600 mb-12">Everything you need for modern digital teaching</p>
+
+          <h2 className="text-4xl font-bold text-center text-gray-800 mb-2 fade-in">Our Features</h2>
+          <p className="text-center text-gray-600 mb-12 fade-in fade-in-delay-1">Everything you need for modern digital teaching - Beyond WhatsApp</p>
           
 
           <div className="relative">
@@ -290,10 +419,11 @@ const Home = () => {
 
             <div className="mx-12">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {getCurrentFeatures().map((feature) => (
+                {getCurrentFeatures().map((feature, index) => (
                   <div 
                     key={feature.id}
-                    className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                    className="bg-white border border-gray-200 rounded-lg shadow-sm card-hover overflow-hidden fade-in"
+                    style={{animationDelay: `${index * 0.2}s`}}
                   >
 
                     <div className="w-full h-48 bg-gray-100">
@@ -311,6 +441,11 @@ const Home = () => {
                         {feature.name}
                       </h5>
                       
+                      {feature.comingSoon && (
+                        <p className="text-red-500 text-sm font-medium mb-2">
+                          Coming Soon
+                        </p>
+                      )}
 
                       <p className="text-gray-600 text-sm leading-relaxed mb-4">
                         {feature.description}
@@ -346,8 +481,8 @@ const Home = () => {
       <div className="bg-gray-50 py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold text-gray-800 mb-2">See in Action</h2>
-            <p className="text-lg text-gray-600">Explore our platform features with interactive demos</p>
+            <h2 className="text-4xl font-bold text-gray-800 mb-2 fade-in">See in Action</h2>
+            <p className="text-lg text-gray-600 fade-in fade-in-delay-1">Explore our platform features with interactive demos</p>
           </div>
           
           <SeeInActionDemo />
@@ -358,33 +493,33 @@ const Home = () => {
       <div className="bg-white py-12">
         <div className="container mx-auto px-6">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Frequently Asked Questions</h2>
-            <p className="text-base text-gray-600">Get answers to common questions about our platform</p>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2 fade-in">Frequently Asked Questions</h2>
+            <p className="text-base text-gray-600 fade-in fade-in-delay-1">Get answers to common questions about our platform</p>
           </div>
           
           <div className="max-w-3xl mx-auto">
             <div className="space-y-3">
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4 fade-in hover:bg-gray-100 transition-colors duration-200">
                 <h3 className="text-base font-semibold text-gray-800 mb-1">How do I create a virtual classroom?</h3>
                 <p className="text-sm text-gray-600">Simply sign up as a teacher, click on "Create Classroom" and follow the easy setup process. You'll get a unique classroom code to share with your students.</p>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4 fade-in fade-in-delay-1 hover:bg-gray-100 transition-colors duration-200">
                 <h3 className="text-base font-semibold text-gray-800 mb-1">Can students join from any device?</h3>
                 <p className="text-sm text-gray-600">Yes! Our platform works on computers, tablets, and smartphones. Students can join classes from any device with an internet connection.</p>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4 fade-in fade-in-delay-2 hover:bg-gray-100 transition-colors duration-200">
                 <h3 className="text-base font-semibold text-gray-800 mb-1">Is there a limit on the number of students?</h3>
-                <p className="text-sm text-gray-600">Our basic plan supports up to 50 students per classroom. For larger classes, we offer premium plans with unlimited student capacity.</p>
+                <p className="text-sm text-gray-600">Currently we are free! After January 2026, we will charge around $1 per year for one classroom. No student limits - unlimited students can join your classroom.</p>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4 fade-in fade-in-delay-3 hover:bg-gray-100 transition-colors duration-200">
                 <h3 className="text-base font-semibold text-gray-800 mb-1">How does the attendance tracking work?</h3>
-                <p className="text-sm text-gray-600">Attendance is automatically tracked when students join live sessions. Teachers can also manually mark attendance and generate detailed reports.</p>
+                <p className="text-sm text-gray-600">Teachers can mark student attendance online from their phone or computer. The system automatically tracks when students join live sessions and allows manual attendance marking for offline classes. Generate detailed attendance reports and send automated email alerts to students with low attendance.</p>
               </div>
               
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4 fade-in fade-in-delay-3 hover:bg-gray-100 transition-colors duration-200">
                 <h3 className="text-base font-semibold text-gray-800 mb-1">Can I record my classes?</h3>
                 <p className="text-sm text-gray-600">Yes! All live sessions can be recorded and saved for students to review later. Recordings are stored securely in your classroom dashboard.</p>
               </div>
@@ -393,6 +528,12 @@ const Home = () => {
         </div>
       </div>
 
+
+      <div className="bg-white py-8 text-center">
+        <a href="/singup" className="inline-block px-6 py-2 bg-[#356AC3] text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105" style={{boxShadow: '0 0 20px rgba(53, 106, 195, 0.3)'}}>
+          Start Your Professional Classroom Today
+        </a>
+      </div>
 
       <div className="bg-white py-2 border-t border-gray-200">
         <div className="container mx-auto px-6">

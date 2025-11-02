@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -6,6 +6,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
+import { initGA, trackPageView } from "./utils/analytics";
 import {
   CallingState,
   StreamCall,
@@ -49,6 +50,11 @@ const client = new StreamVideoClient({ apiKey, user, token });
 
 
 export default function App() {
+  useEffect(() => {
+    // Initialize Google Analytics
+    initGA();
+  }, []);
+
   return (
     <Router>
       <Routes>
