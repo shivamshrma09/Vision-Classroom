@@ -24,7 +24,7 @@ connectToDb();
 
 const corsOptions = {
    origin: [
-    'https://classrommitra.vercel.app,
+    'https://classrommitra.vercel.app',
      'https://vision-classroom2.onrender.com', 
      'http://localhost:3000', 
      
