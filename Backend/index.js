@@ -24,13 +24,10 @@ connectToDb();
 
 const corsOptions = {
    origin: [
-     'https://visionclassro0m.vercel.app', 
-     'https://visionclassr0om.vercel.app', 
+    'https://classrommitra.vercel.app,
      'https://vision-classroom2.onrender.com', 
      'http://localhost:3000', 
-     'https://visionclassroo0m-jkiw.vercel.app', 
-     'https://vision-classroom-beryl.vercel.app',
-     'https://visionclassroom7-yczm.vercel.app'
+     
    ],
    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
    allowedHeaders: ['Content-Type', 'Authorization', 'token'],
